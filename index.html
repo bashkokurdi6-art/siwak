@@ -20,15 +20,11 @@ body{
   justify-content:center;
 }
 
-/* APP */
 .app{width:100%;max-width:420px}
 
-/* HEADER */
 .header{text-align:center;padding:15px}
-.header img{width:55px}
-.header h2{margin-top:5px}
+.header h1{font-size:28px;font-weight:700;letter-spacing:1px}
 
-/* HERO */
 .hero{
   height:220px;
   margin:10px;
@@ -49,14 +45,8 @@ body{
   to{opacity:1}
 }
 
-/* TIME */
-.time{
-  text-align:center;
-  margin-top:10px;
-  opacity:.8;
-}
+.time{text-align:center;margin-top:10px;opacity:.8}
 
-/* CARD */
 .card{
   margin:15px;
   padding:20px;
@@ -65,7 +55,6 @@ body{
   backdrop-filter:blur(15px);
 }
 
-/* INPUT */
 input,select,textarea{
   width:100%;
   padding:14px;
@@ -76,14 +65,12 @@ input,select,textarea{
   color:#fff;
 }
 
-/* FILE PREVIEW */
 .preview{
   width:100%;
   margin-top:10px;
   border-radius:12px;
 }
 
-/* BUTTON */
 button{
   width:100%;
   padding:15px;
@@ -94,10 +81,8 @@ button{
   font-weight:bold;
 }
 
-/* MSG */
 #msg{text-align:center;margin-top:10px;color:#7CFFC4}
 
-/* FOOTER */
 .footer{text-align:center;padding:15px;font-size:12px;opacity:.6}
 </style>
 </head>
@@ -106,26 +91,30 @@ button{
 
 <div class="app">
 
+<!-- HEADER -->
 <div class="header">
-  <img src="logo.jpg">
-  <h2>سیواك</h2>
+  <h1>سيواك</h1>
 </div>
 
+<!-- HERO -->
 <div class="hero">
   حجز ڕەوزەی شەریف 🌙
 </div>
 
+<!-- TIME -->
 <div class="time">
   <div id="clock"></div>
   <div id="hijri"></div>
 </div>
 
+<!-- FORM -->
 <div class="card">
 
 <form id="form" action="https://formspree.io/f/mdayqnoj" method="POST">
 
-<input name="name" placeholder="👤 ناوی سیانی" required>
-<input name="whatsapp" placeholder="📱 واتسئاپ" required>
+<input name="name" placeholder="👤 ناوی سیانی" required minlength="3">
+
+<input name="whatsapp" placeholder="📱 واتسئاپ" required pattern="[0-9+ ]{8,}">
 
 <select name="type" required>
 <option value="">📌 جۆر</option>
@@ -140,12 +129,17 @@ button{
 <option>Qi Card</option>
 </select>
 
-<input type="file" id="file" name="visa">
+<!-- NEW DATE -->
+<input type="date" name="date" required>
+
+<input type="file" id="file" name="visa" accept="image/*">
 <img id="preview" class="preview" style="display:none">
 
 <textarea name="note" placeholder="📝 تێبینی"></textarea>
 
-<button>ناردن</button>
+<input type="hidden" name="_subject" value="حجزێکی نوێ">
+
+<button id="btn">ناردن</button>
 
 </form>
 
@@ -153,7 +147,19 @@ button{
 
 </div>
 
+<!-- FOOTER -->
 <div class="footer">© Siwak</div>
+
+<!-- STATS -->
+<div class="card" style="text-align:center">
+
+  <div>👁 ژمارەی سەردان</div>
+  <h2 id="views">0</h2>
+
+  <div style="margin-top:10px">🟢 ئێستا ئۆنلاین</div>
+  <h3 id="online">1</h3>
+
+</div>
 
 </div>
 
@@ -171,6 +177,7 @@ document.getElementById("hijri").innerHTML = h.toString();
 // IMAGE PREVIEW
 document.getElementById("file").onchange = e=>{
   const file = e.target.files[0];
+  if(!file) return;
   const img = document.getElementById("preview");
   img.src = URL.createObjectURL(file);
   img.style.display="block";
@@ -179,24 +186,45 @@ document.getElementById("file").onchange = e=>{
 // FORM
 const form = document.getElementById("form");
 const msg = document.getElementById("msg");
+const btn = document.getElementById("btn");
 
 form.addEventListener("submit", async (e)=>{
  e.preventDefault();
 
- const res = await fetch(form.action,{
-   method:"POST",
-   body:new FormData(form),
-   headers:{'Accept':'application/json'}
- });
+ btn.innerText="⏳ چاوەڕێ بکە...";
+ btn.disabled=true;
 
- if(res.ok){
-   msg.innerHTML="✅ نێردرا بەسەرکەوتوویی";
-   form.reset();
-   document.getElementById("preview").style.display="none";
- }else{
-   msg.innerHTML="❌ هەڵەیەک هەیە";
+ try{
+   const res = await fetch(form.action,{
+     method:"POST",
+     body:new FormData(form),
+     headers:{'Accept':'application/json'}
+   });
+
+   if(res.ok){
+     msg.innerHTML="✅ نێردرا بەسەرکەوتوویی";
+     form.reset();
+     document.getElementById("preview").style.display="none";
+   }else{
+     msg.innerHTML="❌ هەڵەیەک هەیە";
+   }
+ }catch{
+   msg.innerHTML="❌ هەڵەی نێتۆرک";
  }
+
+ btn.innerText="ناردن";
+ btn.disabled=false;
 });
+
+// VIEWS (local)
+let views = localStorage.getItem("views") || 0;
+views++;
+localStorage.setItem("views", views);
+document.getElementById("views").innerText = views;
+
+// ONLINE (fake)
+document.getElementById("online").innerText =
+  Math.floor(Math.random()*10)+1;
 </script>
 
 </body>
