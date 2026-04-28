@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>سیواك</title>
+<title>سيواك</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/hijri-date/lib/safe.js"></script>
@@ -14,48 +14,62 @@
 
 body{
 font-family:'Cairo',sans-serif;
-background:linear-gradient(#031d1a,#062f2a);
+background:linear-gradient(180deg,#021a17,#063c34);
 color:#fff;
 display:flex;
 justify-content:center;
 }
 
-.app{width:100%;max-width:420px}
+.app{width:100%;max-width:420px;padding-bottom:20px}
 
 /* HEADER */
 .header{text-align:center;padding:20px}
-.header h1{font-size:32px;font-weight:700}
+.header h1{
+font-size:36px;
+font-weight:700;
+background:linear-gradient(45deg,#ffd700,#ffffff);
+-webkit-background-clip:text;
+color:transparent;
+}
 
 /* HERO */
 .hero{
-height:220px;
 margin:10px;
 border-radius:20px;
-background:
-linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.7)),
-url('https://images.unsplash.com/photo-1591608516733-0e0c6c1c7e1d');
-background-size:cover;
-display:flex;
-align-items:flex-end;
-padding:15px;
+overflow:hidden;
+}
+
+.hero img{
+width:100%;
+display:block;
 }
 
 /* HERO TEXT */
 .hero-text{
-width:100%;
-background:rgba(0,0,0,.4);
+position:absolute;
+bottom:20px;
+left:20px;
+right:20px;
+background:rgba(0,0,0,.5);
 padding:10px;
-border-radius:10px;
+border-radius:12px;
 text-align:center;
 }
 
 /* TIME */
-.time{text-align:center;margin:10px 0;opacity:.8}
+.time{
+display:flex;
+justify-content:space-between;
+margin:10px;
+padding:15px;
+border-radius:16px;
+background:rgba(255,255,255,0.05);
+}
 
 /* CARD */
 .card{
 margin:15px;
-padding:20px;
+padding:18px;
 border-radius:18px;
 background:rgba(255,255,255,0.05);
 backdrop-filter:blur(12px);
@@ -67,7 +81,7 @@ width:100%;
 padding:14px;
 margin:8px 0;
 border:none;
-border-radius:12px;
+border-radius:14px;
 background:rgba(255,255,255,0.08);
 color:#fff;
 }
@@ -75,30 +89,32 @@ color:#fff;
 /* BUTTON */
 button{
 width:100%;
-padding:15px;
+padding:16px;
 border:none;
-border-radius:14px;
+border-radius:16px;
 background:linear-gradient(45deg,#1fa37a,#18c29c);
+font-size:16px;
 font-weight:bold;
 }
 
 /* STATS */
 .stats{
 display:flex;
+justify-content:space-between;
 gap:10px;
 }
+
 .stat{
 flex:1;
-background:rgba(255,255,255,0.05);
-padding:12px;
-border-radius:12px;
 text-align:center;
+padding:15px;
+border-radius:14px;
+background:rgba(255,255,255,0.05);
 }
 
-/* MSG */
-#msg{text-align:center;margin-top:10px;color:#7CFFC4}
+.big{font-size:22px;font-weight:bold}
 
-.footer{text-align:center;padding:15px;font-size:12px;opacity:.6}
+.footer{text-align:center;font-size:12px;opacity:.6;margin-top:10px}
 </style>
 </head>
 
@@ -108,64 +124,64 @@ text-align:center;
 
 <div class="header">
 <h1>سيواك</h1>
+<p>حجز ڕەوزەی شەریف</p>
 </div>
 
 <div class="hero">
-<div class="hero-text">حجز ڕەوزەی شەریف 🌙</div>
+<img src="https://images.unsplash.com/photo-1591608516733-0e0c6c1c7e1d">
 </div>
 
 <div class="time">
-<div id="clock"></div>
-<div id="hijri"></div>
+<div>
+⏰ <span id="clock"></span>
+</div>
+<div>
+📅 <span id="hijri"></span>
+</div>
 </div>
 
 <div class="card">
 
-<form id="form">
+<form action="https://formspree.io/f/mdayqnoj" method="POST">
 
 <input name="name" placeholder="👤 ناوی سیانی" required>
 <input name="whatsapp" placeholder="📱 واتسئاپ" required>
 
-<select name="type" required>
-<option value="">📌 جۆر</option>
-<option>گروپ</option>
-<option>تاک</option>
+<select name="type">
+<option>👥 گروپ</option>
+<option>👤 تاک</option>
 </select>
 
-<select name="payment" required>
-<option value="">💳 پارەدان</option>
-<option>FIB</option>
-<option>FastPay</option>
-<option>Qi Card</option>
+<select name="payment">
+<option>💳 FIB</option>
+<option>💳 FastPay</option>
+<option>💳 Qi Card</option>
 </select>
 
-<input type="date" name="date" required>
+<input type="date" name="date">
 
-<input type="file" id="file">
+<input type="file" name="file">
+
 <textarea name="note" placeholder="📝 تێبینی"></textarea>
 
-<button id="btn">ناردن</button>
+<button>✈️ ناردن</button>
 
 </form>
 
-<div id="msg"></div>
-
 </div>
 
-<div class="card">
-<div class="stats">
+<div class="card stats">
 
 <div class="stat">
-<div>👁 سەردان</div>
-<div id="views">0</div>
+👁 سەردان
+<div id="views" class="big">0</div>
 </div>
 
 <div class="stat">
-<div>🟢 ئۆنلاین</div>
-<div id="online">1</div>
+🟢 ئۆنلاین
+<div id="online" class="big">1</div>
 </div>
 
-</div>
 </div>
 
 <div class="footer">© Siwak</div>
@@ -173,17 +189,14 @@ text-align:center;
 </div>
 
 <script>
-// CLOCK
 setInterval(()=>{
-document.getElementById("clock").innerText =
+document.getElementById("clock").innerText=
 new Date().toLocaleTimeString();
 },1000);
 
-// HIJRI
 let h=new HijriDate();
 document.getElementById("hijri").innerText=h.toString();
 
-// STATS
 let views=localStorage.getItem("views")||0;
 views++;
 localStorage.setItem("views",views);
@@ -191,46 +204,6 @@ document.getElementById("views").innerText=views;
 
 document.getElementById("online").innerText=
 Math.floor(Math.random()*10)+1;
-
-// FORM + IMAGE FIX
-const form=document.getElementById("form");
-const btn=document.getElementById("btn");
-const msg=document.getElementById("msg");
-
-form.addEventListener("submit",async(e)=>{
-e.preventDefault();
-btn.innerText="⏳...";
-
-const file=document.getElementById("file").files[0];
-let imageBase64="";
-
-if(file){
-const reader=new FileReader();
-reader.onload=async function(){
-imageBase64=reader.result;
-
-sendData(imageBase64);
-};
-reader.readAsDataURL(file);
-}else{
-sendData("");
-}
-
-async function sendData(img){
-const data=new FormData(form);
-data.append("image",img);
-
-await fetch("https://formspree.io/f/mdayqnoj",{
-method:"POST",
-body:data,
-headers:{'Accept':'application/json'}
-});
-
-msg.innerText="✅ نێردرا";
-btn.innerText="ناردن";
-form.reset();
-}
-});
 </script>
 
 </body>
