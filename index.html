@@ -1,1 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siwak Pro Max</title>
+<link rel="stylesheet" href="style.css">
+</head>
 
+<body>
+
+<header>🌿 Siwak Pro Max</header>
+
+<nav>
+  <button onclick="showPage('home')">Home</button>
+  <button onclick="showPage('prayer')">Prayer</button>
+  <button onclick="showPage('quran')">Quran</button>
+  <button onclick="showPage('login')">Login</button>
+</nav>
+
+<section id="home" class="active">
+  <h2>Welcome 🤲</h2>
+</section>
+
+<section id="prayer">
+  <h2>Prayer Times 🕌</h2>
+  <div id="prayerTimes">Loading...</div>
+</section>
+
+<section id="quran">
+  <h2>Quran 📖</h2>
+  <button onclick="loadAyah()">Load Ayah</button>
+  <div id="ayah"></div>
+</section>
+
+<section id="login">
+  <h2>Login 🔐</h2>
+  <input id="user" placeholder="username">
+  <input id="pass" type="password" placeholder="password">
+  <button onclick="login()">Login</button>
+  <p id="msg"></p>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
