@@ -1,78 +1,81 @@
 <!DOCTYPE html>
-<html lang="ku" dir="rtl">
+<html lang="ku">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سیواك</title>
 
-<title>Siwak Booking</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
 
 <style>
-body { font-family: 'Noto Sans Arabic', sans-serif; }
+body{font-family:sans-serif;background:#0b1d1a;color:white}
+input,select,textarea{width:100%;margin:10px 0;padding:10px}
+button{padding:12px;background:green;color:white;border:none}
 </style>
-
 </head>
 
-<body class="bg-gray-100 text-right">
+<body>
 
-<!-- 🔝 HEADER -->
-<header class="bg-green-900 text-white p-4 flex items-center gap-3">
-  <img src="images/logo.jpg" class="w-10 h-10 rounded-full">
-  <h1 class="text-xl">سیواک</h1>
-</header>
+<h2>سیواك - حجز ڕەوزە</h2>
 
-<!-- 🕌 HERO -->
-<div class="p-4">
-  <img src="images/hero.jpg" class="w-full rounded">
-</div>
+<input id="name" placeholder="ناوی سیانی">
+<input id="phone" placeholder="واتسئاپ">
 
-<!-- INFO -->
-<div class="p-4 bg-white m-4 rounded shadow">
-  <img src="images/info.jpg" class="rounded mb-3">
-  <p>زانیاری دەربارەی ڕۆژوی شریف...</p>
-</div>
+<select id="type">
+<option>گروپ</option>
+<option>تاک</option>
+</select>
 
-<!-- 🧾 FORM -->
-<div class="p-4 bg-white m-4 rounded shadow space-y-3">
+<select id="pay">
+<option>FIB</option>
+<option>FastPay</option>
+<option>Qi Card</option>
+</select>
 
-  <h2 class="font-bold">فۆرمی حجز</h2>
+<input type="file" id="visa">
+<textarea id="note" placeholder="تێبینی"></textarea>
 
-  <!-- 1 ناو -->
-  <input class="border p-2 w-full rounded" placeholder="ناوی سیانی">
+<button onclick="send()">ناردن</button>
 
-  <!-- 2 واتساپ -->
-  <input class="border p-2 w-full rounded" placeholder="ژمارەی واتساپ">
+<script>
+// 🔥 CONFIG (لە Firebase کۆپی بکە)
+const firebaseConfig = {
+  apiKey: "PUT-YOURS",
+  authDomain: "PUT-YOURS",
+  projectId: "PUT-YOURS",
+  storageBucket: "PUT-YOURS",
+  messagingSenderId: "PUT-YOURS",
+  appId: "PUT-YOURS"
+};
 
-  <!-- 3 option -->
-  <select class="border p-2 w-full rounded">
-    <option>گروپ</option>
-    <option>تاک</option>
-  </select>
+firebase.initializeApp(firebaseConfig);
 
-  <!-- 4 upload visa -->
-  <label class="block">وێنەی ڤیزا:</label>
-  <input type="file" class="border p-2 w-full">
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-  <!-- 5 note -->
-  <textarea class="border p-2 w-full rounded" placeholder="تێبینی"></textarea>
+async function send(){
+    let file = document.getElementById("visa").files[0];
 
-  <!-- 6 payment -->
-  <div class="bg-gray-100 p-3 rounded">
-    <p>پارەدان:</p>
-    <p>Fib: 0750xxxxxxx</p>
-    <p>FastPay: 0770xxxxxxx</p>
-    <p>Qi Card: 0780xxxxxxx</p>
-  </div>
+    // upload image
+    let ref = storage.ref("visa/" + file.name);
+    await ref.put(file);
+    let url = await ref.getDownloadURL();
 
-  <!-- 7 submit -->
-  <button class="bg-green-800 text-white w-full py-2 rounded">
-    ناردن
-  </button>
+    // save data
+    await db.collection("orders").add({
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        type: document.getElementById("type").value,
+        pay: document.getElementById("pay").value,
+        note: document.getElementById("note").value,
+        visa: url,
+        time: new Date()
+    });
 
-</div>
+    alert("بەسەرکەوتوویی نێردرا");
+}
+</script>
 
 </body>
 </html>
