@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>سيواك</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/hijri-date/lib/safe.js"></script>
 
 <style>
@@ -17,38 +17,36 @@ background:#021a17;
 color:#fff;
 }
 
-/* WRAP */
-.wrap{
+/* CONTAINER */
+.container{
 max-width:420px;
 margin:auto;
-padding:24px 18px 30px;
+padding:20px;
 }
 
 /* HEADER */
 .header{
 text-align:center;
-margin-bottom:28px;
+margin-bottom:20px;
 }
 .header h1{
-font-size:34px;
-font-weight:800;
-letter-spacing:1px;
+font-size:30px;
+font-weight:700;
 }
 .header p{
 opacity:.5;
 font-size:13px;
-margin-top:4px;
 }
 
-/* HERO (clean banner) */
+/* HERO */
 .hero{
-border-radius:18px;
+border-radius:14px;
 overflow:hidden;
-margin-bottom:22px;
+margin-bottom:20px;
 }
 .hero img{
 width:100%;
-height:180px;
+height:160px;
 object-fit:cover;
 }
 
@@ -56,39 +54,36 @@ object-fit:cover;
 .time{
 display:flex;
 justify-content:space-between;
-margin-bottom:26px;
 font-size:13px;
 opacity:.6;
-}
-
-/* FORM CARD */
-.card{
-padding:18px;
-border-radius:20px;
-background:#062925;
 margin-bottom:20px;
 }
 
-/* INPUT */
-.input{
+/* FORM */
+.card{
+background:#062925;
+padding:16px;
+border-radius:16px;
+}
+
+input,select,textarea{
 width:100%;
-padding:15px;
-margin-bottom:12px;
-border-radius:14px;
+padding:14px;
+margin:6px 0;
 border:none;
+border-radius:12px;
 background:#08352f;
 color:#fff;
 }
 
-/* BUTTON */
-.button{
+button{
 width:100%;
-padding:16px;
-border-radius:16px;
+padding:14px;
+margin-top:8px;
 border:none;
+border-radius:14px;
 background:#1fa37a;
-font-weight:700;
-font-size:15px;
+font-weight:600;
 }
 
 /* STATS */
@@ -98,22 +93,20 @@ justify-content:space-between;
 margin-top:20px;
 }
 .stat{
-flex:1;
 text-align:center;
+flex:1;
 }
 .stat h2{
-font-size:22px;
-font-weight:700;
+font-size:20px;
 }
 .stat span{
 font-size:11px;
 opacity:.4;
 }
 
-/* FOOTER */
 .footer{
 text-align:center;
-margin-top:28px;
+margin-top:20px;
 opacity:.3;
 font-size:12px;
 }
@@ -122,7 +115,7 @@ font-size:12px;
 
 <body>
 
-<div class="wrap">
+<div class="container">
 
 <div class="header">
 <h1>سيواك</h1>
@@ -142,26 +135,26 @@ font-size:12px;
 
 <form action="https://formspree.io/f/mdayqnoj" method="POST">
 
-<input class="input" name="name" placeholder="ناوی سیانی">
-<input class="input" name="whatsapp" placeholder="واتسئاپ">
+<input name="name" placeholder="ناوی سیانی">
+<input name="whatsapp" placeholder="واتسئاپ">
 
-<select class="input" name="type">
+<select name="type">
 <option>گروپ</option>
 <option>تاک</option>
 </select>
 
-<select class="input" name="payment">
+<select name="payment">
 <option>FIB</option>
 <option>FastPay</option>
 <option>Qi Card</option>
 </select>
 
-<input class="input" type="date" name="date">
-<input class="input" type="file" name="file">
+<input type="date" name="date">
+<input type="file" name="file">
 
-<textarea class="input" name="note" placeholder="تێبینی"></textarea>
+<textarea name="note" placeholder="تێبینی"></textarea>
 
-<button class="button">ناردن</button>
+<button>ناردن</button>
 
 </form>
 
@@ -184,7 +177,10 @@ font-size:12px;
 </div>
 
 <script>
-setInterval(()=>{document.getElementById("clock").innerText=new Date().toLocaleTimeString();},1000);
+setInterval(()=>{
+document.getElementById("clock").innerText=new Date().toLocaleTimeString();
+},1000);
+
 let h=new HijriDate();
 document.getElementById("hijri").innerText=h.toString();
 
