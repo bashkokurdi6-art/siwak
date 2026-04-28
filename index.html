@@ -4,118 +4,128 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>سیواك | حجز ڕەوزە</title>
+<title>سیواك</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/hijri-date/lib/safe.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 
 body{
   font-family:'Cairo',sans-serif;
-  background:linear-gradient(#031d1a,#0b3d35);
+  background:linear-gradient(180deg,#021a17,#063c34);
   color:#fff;
+  display:flex;
+  justify-content:center;
 }
+
+/* APP */
+.app{width:100%;max-width:420px}
 
 /* HEADER */
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  padding:15px;
-}
-
-.header img{
-  width:55px;
-}
-
-.header h1{
-  font-size:20px;
-}
+.header{text-align:center;padding:15px}
+.header img{width:55px}
+.header h2{margin-top:5px}
 
 /* HERO */
 .hero{
-  height:280px;
-  background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.7)),
-  url('https://images.unsplash.com/photo-1564769625905-50e93615e769');
+  height:220px;
+  margin:10px;
+  border-radius:20px;
+  background:
+  linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.8)),
+  url('https://images.unsplash.com/photo-1542810634-71277d95dcbb');
   background-size:cover;
   display:flex;
-  align-items:center;
-  justify-content:center;
+  align-items:flex-end;
+  padding:20px;
+  font-size:18px;
+  animation:fade 1.5s ease;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1}
+}
+
+/* TIME */
+.time{
   text-align:center;
-  font-size:22px;
-  font-weight:bold;
+  margin-top:10px;
+  opacity:.8;
 }
 
 /* CARD */
 .card{
-  background:#062f2a;
-  margin:20px;
+  margin:15px;
   padding:20px;
-  border-radius:18px;
-  box-shadow:0 0 20px rgba(0,0,0,.5);
+  border-radius:20px;
+  background:rgba(255,255,255,0.06);
+  backdrop-filter:blur(15px);
 }
 
 /* INPUT */
 input,select,textarea{
   width:100%;
   padding:14px;
-  margin:10px 0;
+  margin:8px 0;
   border:none;
-  border-radius:10px;
-  background:#0f4d45;
+  border-radius:14px;
+  background:rgba(255,255,255,0.08);
   color:#fff;
+}
+
+/* FILE PREVIEW */
+.preview{
+  width:100%;
+  margin-top:10px;
+  border-radius:12px;
 }
 
 /* BUTTON */
 button{
   width:100%;
   padding:15px;
-  background:linear-gradient(45deg,#1fa37a,#0c7a5d);
+  margin-top:10px;
   border:none;
-  border-radius:12px;
-  font-size:16px;
+  border-radius:16px;
+  background:linear-gradient(45deg,#1fa37a,#18c29c);
   font-weight:bold;
 }
 
 /* MSG */
-#msg{
-  text-align:center;
-  margin-top:10px;
-  color:#9fffda;
-}
+#msg{text-align:center;margin-top:10px;color:#7CFFC4}
 
 /* FOOTER */
-.footer{
-  text-align:center;
-  padding:20px;
-  opacity:.7;
-}
+.footer{text-align:center;padding:15px;font-size:12px;opacity:.6}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
+<div class="app">
+
 <div class="header">
   <img src="logo.jpg">
-  <h1>سیواك</h1>
+  <h2>سیواك</h2>
 </div>
 
-<!-- HERO -->
 <div class="hero">
-  حجز ڕەوزەی شەریف<br>بە شێوەیەکی ئاسان
+  حجز ڕەوزەی شەریف 🌙
 </div>
 
-<!-- FORM -->
+<div class="time">
+  <div id="clock"></div>
+  <div id="hijri"></div>
+</div>
+
 <div class="card">
 
 <form id="form" action="https://formspree.io/f/mdayqnoj" method="POST">
 
 <input name="name" placeholder="👤 ناوی سیانی" required>
-
-<input name="whatsapp" placeholder="📱 ژمارەی واتسئاپ" required>
+<input name="whatsapp" placeholder="📱 واتسئاپ" required>
 
 <select name="type" required>
 <option value="">📌 جۆر</option>
@@ -130,7 +140,8 @@ button{
 <option>Qi Card</option>
 </select>
 
-<input type="file" name="visa">
+<input type="file" id="file" name="visa">
+<img id="preview" class="preview" style="display:none">
 
 <textarea name="note" placeholder="📝 تێبینی"></textarea>
 
@@ -142,12 +153,30 @@ button{
 
 </div>
 
-<!-- FOOTER -->
-<div class="footer">
-© سیواك
+<div class="footer">© Siwak</div>
+
 </div>
 
 <script>
+// CLOCK
+setInterval(()=>{
+  document.getElementById("clock").innerHTML =
+    new Date().toLocaleTimeString();
+},1000);
+
+// HIJRI
+let h = new HijriDate();
+document.getElementById("hijri").innerHTML = h.toString();
+
+// IMAGE PREVIEW
+document.getElementById("file").onchange = e=>{
+  const file = e.target.files[0];
+  const img = document.getElementById("preview");
+  img.src = URL.createObjectURL(file);
+  img.style.display="block";
+};
+
+// FORM
 const form = document.getElementById("form");
 const msg = document.getElementById("msg");
 
@@ -161,8 +190,9 @@ form.addEventListener("submit", async (e)=>{
  });
 
  if(res.ok){
-   msg.innerHTML="✅ بەسەرکەوتوویی نێردرا";
+   msg.innerHTML="✅ نێردرا بەسەرکەوتوویی";
    form.reset();
+   document.getElementById("preview").style.display="none";
  }else{
    msg.innerHTML="❌ هەڵەیەک هەیە";
  }
