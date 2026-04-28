@@ -2,79 +2,171 @@
 <html lang="ku">
 <head>
 <meta charset="UTF-8">
-<title>سیواك</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
+<title>سیواك | حجز ڕەوزە</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-body{font-family:sans-serif;background:#0b1d1a;color:white}
-input,select,textarea{width:100%;margin:10px 0;padding:10px}
-button{padding:12px;background:green;color:white;border:none}
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Cairo',sans-serif;
+  background:linear-gradient(#031d1a,#0b3d35);
+  color:#fff;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:15px;
+}
+
+.header img{
+  width:55px;
+}
+
+.header h1{
+  font-size:20px;
+}
+
+/* HERO */
+.hero{
+  height:280px;
+  background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.7)),
+  url('https://images.unsplash.com/photo-1564769625905-50e93615e769');
+  background-size:cover;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+}
+
+/* CARD */
+.card{
+  background:#062f2a;
+  margin:20px;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 0 20px rgba(0,0,0,.5);
+}
+
+/* INPUT */
+input,select,textarea{
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border:none;
+  border-radius:10px;
+  background:#0f4d45;
+  color:#fff;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:15px;
+  background:linear-gradient(45deg,#1fa37a,#0c7a5d);
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:bold;
+}
+
+/* MSG */
+#msg{
+  text-align:center;
+  margin-top:10px;
+  color:#9fffda;
+}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:20px;
+  opacity:.7;
+}
 </style>
 </head>
 
 <body>
 
-<h2>سیواك - حجز ڕەوزە</h2>
+<!-- HEADER -->
+<div class="header">
+  <img src="logo.jpg">
+  <h1>سیواك</h1>
+</div>
 
-<input id="name" placeholder="ناوی سیانی">
-<input id="phone" placeholder="واتسئاپ">
+<!-- HERO -->
+<div class="hero">
+  حجز ڕەوزەی شەریف<br>بە شێوەیەکی ئاسان
+</div>
 
-<select id="type">
+<!-- FORM -->
+<div class="card">
+
+<form id="form" action="https://formspree.io/f/mdayqnoj" method="POST">
+
+<input name="name" placeholder="👤 ناوی سیانی" required>
+
+<input name="whatsapp" placeholder="📱 ژمارەی واتسئاپ" required>
+
+<select name="type" required>
+<option value="">📌 جۆر</option>
 <option>گروپ</option>
 <option>تاک</option>
 </select>
 
-<select id="pay">
+<select name="payment" required>
+<option value="">💳 پارەدان</option>
 <option>FIB</option>
 <option>FastPay</option>
 <option>Qi Card</option>
 </select>
 
-<input type="file" id="visa">
-<textarea id="note" placeholder="تێبینی"></textarea>
+<input type="file" name="visa">
 
-<button onclick="send()">ناردن</button>
+<textarea name="note" placeholder="📝 تێبینی"></textarea>
+
+<button>ناردن</button>
+
+</form>
+
+<div id="msg"></div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+© سیواك
+</div>
 
 <script>
-// 🔥 CONFIG (لە Firebase کۆپی بکە)
-const firebaseConfig = {
-  apiKey: "PUT-YOURS",
-  authDomain: "PUT-YOURS",
-  projectId: "PUT-YOURS",
-  storageBucket: "PUT-YOURS",
-  messagingSenderId: "PUT-YOURS",
-  appId: "PUT-YOURS"
-};
+const form = document.getElementById("form");
+const msg = document.getElementById("msg");
 
-firebase.initializeApp(firebaseConfig);
+form.addEventListener("submit", async (e)=>{
+ e.preventDefault();
 
-const db = firebase.firestore();
-const storage = firebase.storage();
+ const res = await fetch(form.action,{
+   method:"POST",
+   body:new FormData(form),
+   headers:{'Accept':'application/json'}
+ });
 
-async function send(){
-    let file = document.getElementById("visa").files[0];
-
-    // upload image
-    let ref = storage.ref("visa/" + file.name);
-    await ref.put(file);
-    let url = await ref.getDownloadURL();
-
-    // save data
-    await db.collection("orders").add({
-        name: document.getElementById("name").value,
-        phone: document.getElementById("phone").value,
-        type: document.getElementById("type").value,
-        pay: document.getElementById("pay").value,
-        note: document.getElementById("note").value,
-        visa: url,
-        time: new Date()
-    });
-
-    alert("بەسەرکەوتوویی نێردرا");
-}
+ if(res.ok){
+   msg.innerHTML="✅ بەسەرکەوتوویی نێردرا";
+   form.reset();
+ }else{
+   msg.innerHTML="❌ هەڵەیەک هەیە";
+ }
+});
 </script>
 
 </body>
