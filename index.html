@@ -31,7 +31,7 @@ body{
   border-radius:20px;
   background:
   linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.8)),
-  url('https://images.unsplash.com/photo-1542810634-71277d95dcbb');
+  url('https://images.unsplash.com/photo-1591608516733-0e0c6c1c7e1d');
   background-size:cover;
   display:flex;
   align-items:flex-end;
@@ -91,23 +91,19 @@ button{
 
 <div class="app">
 
-<!-- HEADER -->
 <div class="header">
   <h1>سيواك</h1>
 </div>
 
-<!-- HERO -->
 <div class="hero">
   حجز ڕەوزەی شەریف 🌙
 </div>
 
-<!-- TIME -->
 <div class="time">
   <div id="clock"></div>
   <div id="hijri"></div>
 </div>
 
-<!-- FORM -->
 <div class="card">
 
 <form id="form" action="https://formspree.io/f/mdayqnoj" method="POST">
@@ -129,7 +125,6 @@ button{
 <option>Qi Card</option>
 </select>
 
-<!-- NEW DATE -->
 <input type="date" name="date" required>
 
 <input type="file" id="file" name="visa" accept="image/*">
@@ -147,18 +142,25 @@ button{
 
 </div>
 
-<!-- FOOTER -->
 <div class="footer">© Siwak</div>
 
-<!-- STATS -->
-<div class="card" style="text-align:center">
+<!-- CLEAN STATS -->
+<div class="card">
+  <div style="display:flex; justify-content:space-between; text-align:center">
 
-  <div>👁 ژمارەی سەردان</div>
-  <h2 id="views">0</h2>
+    <div style="flex:1">
+      <div style="opacity:.7; font-size:13px">ژمارەی سەردان</div>
+      <div id="views" style="font-size:22px; font-weight:600">0</div>
+    </div>
 
-  <div style="margin-top:10px">🟢 ئێستا ئۆنلاین</div>
-  <h3 id="online">1</h3>
+    <div style="width:1px; background:rgba(255,255,255,.1)"></div>
 
+    <div style="flex:1">
+      <div style="opacity:.7; font-size:13px">ئێستا ئۆنلاین</div>
+      <div id="online" style="font-size:22px; font-weight:600">1</div>
+    </div>
+
+  </div>
 </div>
 
 </div>
@@ -216,7 +218,7 @@ form.addEventListener("submit", async (e)=>{
  btn.disabled=false;
 });
 
-// VIEWS (local)
+// VIEWS
 let views = localStorage.getItem("views") || 0;
 views++;
 localStorage.setItem("views", views);
