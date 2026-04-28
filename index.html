@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Siwak Pro Dashboard</title>
+<title>Siwak Booking</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -18,110 +18,61 @@ body { font-family: 'Noto Sans Arabic', sans-serif; }
 
 <body class="bg-gray-100 text-right">
 
-<!-- NAV -->
-<header class="bg-[#0b3d2e] text-white p-4 flex justify-between">
-  <h1>سیواک</h1>
-  <button onclick="toggleMenu()">☰</button>
+<!-- 🔝 HEADER -->
+<header class="bg-green-900 text-white p-4 flex items-center gap-3">
+  <img src="images/logo.jpg" class="w-10 h-10 rounded-full">
+  <h1 class="text-xl">سیواک</h1>
 </header>
 
-<div id="menu" class="hidden bg-[#0b3d2e] text-white p-4 space-y-2">
-  <a href="#" onclick="show('home')">سەرەکی</a>
-  <a href="#" onclick="show('form')">حجز</a>
-  <a href="#" onclick="show('dashboard')">Dashboard</a>
+<!-- 🕌 HERO -->
+<div class="p-4">
+  <img src="images/hero.jpg" class="w-full rounded">
 </div>
 
-<!-- HOME -->
-<section id="home" class="p-6">
+<!-- INFO -->
+<div class="p-4 bg-white m-4 rounded shadow">
+  <img src="images/info.jpg" class="rounded mb-3">
+  <p>زانیاری دەربارەی ڕۆژوی شریف...</p>
+</div>
 
-  <div class="relative h-[300px] mb-4">
-    <img src="images/hero.jpg" class="w-full h-full object-cover rounded">
-    <div class="absolute inset-0 bg-black/40 flex items-center p-6 text-white">
-      <h2 class="text-2xl">سیواک</h2>
-    </div>
+<!-- 🧾 FORM -->
+<div class="p-4 bg-white m-4 rounded shadow space-y-3">
+
+  <h2 class="font-bold">فۆرمی حجز</h2>
+
+  <!-- 1 ناو -->
+  <input class="border p-2 w-full rounded" placeholder="ناوی سیانی">
+
+  <!-- 2 واتساپ -->
+  <input class="border p-2 w-full rounded" placeholder="ژمارەی واتساپ">
+
+  <!-- 3 option -->
+  <select class="border p-2 w-full rounded">
+    <option>گروپ</option>
+    <option>تاک</option>
+  </select>
+
+  <!-- 4 upload visa -->
+  <label class="block">وێنەی ڤیزا:</label>
+  <input type="file" class="border p-2 w-full">
+
+  <!-- 5 note -->
+  <textarea class="border p-2 w-full rounded" placeholder="تێبینی"></textarea>
+
+  <!-- 6 payment -->
+  <div class="bg-gray-100 p-3 rounded">
+    <p>پارەدان:</p>
+    <p>Fib: 0750xxxxxxx</p>
+    <p>FastPay: 0770xxxxxxx</p>
+    <p>Qi Card: 0780xxxxxxx</p>
   </div>
 
-  <div class="bg-white p-4 rounded shadow">
-    نرخ: <b>50$</b> بۆ هەر کەس
-  </div>
+  <!-- 7 submit -->
+  <button class="bg-green-800 text-white w-full py-2 rounded">
+    ناردن
+  </button>
 
-</section>
-
-<!-- FORM -->
-<section id="form" class="hidden p-6">
-
-  <div class="bg-white p-4 rounded shadow space-y-3">
-
-    <h3>فۆرمی حجز</h3>
-
-    <input id="name" class="border p-2 w-full rounded" placeholder="ناو">
-    <input id="phone" class="border p-2 w-full rounded" placeholder="مۆبایل">
-
-    <!-- upload -->
-    <input type="file" id="file" class="border p-2 w-full">
-
-    <button onclick="submitForm()" class="bg-green-800 text-white w-full py-2 rounded">
-      ناردن
-    </button>
-
-  </div>
-
-</section>
-
-<!-- DASHBOARD -->
-<section id="dashboard" class="hidden p-6">
-
-  <div class="bg-white p-4 rounded shadow mb-4">
-    <h3>داواکاریەکان</h3>
-    <div id="list"></div>
-  </div>
-
-  <div class="bg-white p-4 rounded shadow">
-    <h3>پارەدان</h3>
-    <button class="bg-green-700 text-white px-4 py-2 rounded">
-      پارە بدە (Demo)
-    </button>
-  </div>
-
-</section>
-
-<script>
-function toggleMenu(){
-  document.getElementById("menu").classList.toggle("hidden");
-}
-
-function show(id){
-  document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
-
-// save data
-let data = [];
-
-function submitForm(){
-  let name = document.getElementById("name").value;
-  let phone = document.getElementById("phone").value;
-
-  if(!name || !phone){
-    alert("تکایە هەموو خانەکان پڕ بکە");
-    return;
-  }
-
-  data.push({name, phone});
-  render();
-
-  alert("نێردرا ✅");
-}
-
-function render(){
-  let html = data.map(d=>`
-    <div class="border p-2 my-2">
-      👤 ${d.name} - 📞 ${d.phone}
-    </div>
-  `).join("");
-
-  document.getElementById("list").innerHTML = html;
-}
-</script>
+</div>
 
 </body>
 </html>
