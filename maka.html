@@ -3,51 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مەکە</title>
+
+<title>SIWAK - هۆتێلەکانی مەکە</title>
 
 <style>
 body {
   margin: 0;
   font-family: sans-serif;
-  background: #f5f5f5;
-  text-align: center;
+  background: linear-gradient(#f8f9fa, #e9ecef);
 }
 
+/* header */
 .header {
-  background: #0f5132;
+  background: linear-gradient(90deg,#0f5132,#198754);
   color: white;
-  padding: 15px;
-  font-size: 20px;
+  text-align: center;
+  padding: 18px;
+  font-size: 22px;
+  font-weight: bold;
 }
 
-.card {
-  background: white;
-  margin: 15px;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
-
-.card h2 {
+/* container */
+.container {
   padding: 10px;
 }
 
+/* card */
+.card {
+  background: white;
+  margin: 15px 10px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+/* image */
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* content */
+.content {
+  padding: 10px;
+}
+
+/* title */
+.title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* location */
+.location {
+  color: gray;
+  font-size: 14px;
+}
+
+/* button */
 .btn {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px 20px;
+  display: block;
+  margin-top: 10px;
+  padding: 10px;
   background: #198754;
   color: white;
+  text-align: center;
   border-radius: 10px;
   text-decoration: none;
 }
 
+/* back */
+.back {
+  text-align: center;
+  margin: 20px;
+}
 </style>
 </head>
 
@@ -55,17 +90,38 @@ body {
 
 <div class="header">هۆتێلەکانی مەکە 🕌</div>
 
+<div class="container">
+
 <div class="card">
-  <img src="hero.jpg">
-  <h2>هۆتێلی نزیک کعبە</h2>
+  <img src="https://images.unsplash.com/photo-1564769625905-50e93615e769">
+  <div class="content">
+    <div class="title">هۆتێلی نزیک کعبە</div>
+    <div class="location">مەکە</div>
+    <a class="btn" href="#">بینینی زیاتر</a>
+  </div>
 </div>
 
 <div class="card">
-  <img src="info.jpg">
-  <h2>هۆتێلی بە نرخێکی باش</h2>
+  <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b">
+  <div class="content">
+    <div class="title">هۆتێلی 5 ستار</div>
+    <div class="location">نزیک حەرم</div>
+    <a class="btn" href="#">بینینی زیاتر</a>
+  </div>
 </div>
 
-<a class="btn" href="index.html">گەڕانەوە</a>
+<div class="card">
+  <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427">
+  <div class="content">
+    <div class="title">هۆتێلی بە نرخێکی باش</div>
+    <div class="location">مەکە</div>
+    <a class="btn" href="#">بینینی زیاتر</a>
+  </div>
+</div>
+
+</div>
+
+<a class="btn back" href="index.html">گەڕانەوە</a>
 
 </body>
 </html>
