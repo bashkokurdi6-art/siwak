@@ -3,68 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>SIWAK</title>
 
 <style>
-body {margin:0; font-family:sans-serif; background:#f5f5f5;}
-
-.header {
-  background:#198754;
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:white;
+}
+
+/* header */
+.header{
   text-align:center;
-  padding:15px;
+  padding:25px;
+  font-size:26px;
+  font-weight:bold;
+}
+
+/* section */
+.section{ margin:20px; }
+
+.title{
+  margin:15px 0;
   font-size:20px;
 }
 
-.section-title {
-  padding:10px;
-  font-weight:bold;
-  font-size:18px;
-}
-
-/* hotel image */
-.hero {
+/* image */
+.hero{
   width:100%;
-  height:180px;
+  height:200px;
+  border-radius:25px;
   object-fit:cover;
 }
 
-/* dashboard */
-.card {
-  background:white;
-  margin:10px;
-  padding:10px;
-  border-radius:15px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
-
-.grid {
+/* grid */
+.grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:5px;
+  gap:15px;
 }
 
-.box {
-  background:#eee;
+/* card */
+.card{
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(15px);
+  border-radius:20px;
+  padding:12px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:scale(1.05);
+  background:rgba(255,255,255,0.2);
+}
+
+.box{
+  background:rgba(255,255,255,0.25);
   padding:8px;
+  margin:4px 0;
   border-radius:10px;
-  font-size:14px;
 }
 
-/* payment */
-.payment-box {
+/* 💳 PAYMENT (ثابت لە ژێرەوە) */
+.payment{
+  margin:30px 20px;
   background:white;
-  margin:10px;
-  padding:10px;
-  border-radius:15px;
+  color:black;
+  padding:20px;
+  border-radius:25px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-input, textarea {
+/* pay cards */
+.payRow{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.payCard{
+  flex:1;
+  background:#f1f1f1;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.payCard:hover{
+  background:#198754;
+  color:white;
+}
+
+/* inputs */
+input,textarea{
   width:100%;
-  padding:10px;
-  margin:5px 0;
+  padding:12px;
+  margin:8px 0;
   border-radius:10px;
   border:1px solid #ccc;
+}
+
+/* upload */
+.upload{
+  border:2px dashed #ccc;
+  padding:15px;
+  text-align:center;
+  border-radius:12px;
+}
+
+/* button */
+.btn{
+  background:linear-gradient(90deg,#198754,#20c997);
+  color:white;
+  padding:14px;
+  text-align:center;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
 }
 </style>
 
@@ -74,82 +134,95 @@ input, textarea {
 
 <div class="header">SIWAK 🕌</div>
 
-<!-- 🕌 SECTION 1 -->
-<div class="section-title">هۆتێلە نزیک حەرەم</div>
+<!-- 🏨 HOTELS -->
+<div class="section">
+<div class="title">هۆتێلە نزیک حەرەم</div>
 <img class="hero" src="https://images.unsplash.com/photo-1564769625905-50e93615e769">
 
-<!-- 10 cards -->
-<div id="haram-hotels"></div>
-
-<!-- 🏨 SECTION 2 -->
-<div class="section-title">هۆتێلە ناوەندەکان</div>
-<img class="hero" src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b">
-<div id="center-hotels"></div>
-
-<!-- 🏨 SECTION 3 -->
-<div class="section-title">محبس جن</div>
-<img class="hero" src="https://images.unsplash.com/photo-1590490360182-c33d57733427">
-<div id="mahbas-hotels"></div>
+<div id="hotels"></div>
+</div>
 
 <!-- 💳 PAYMENT -->
-<div class="section-title">پارەدان</div>
+<div class="payment" id="paymentSection">
 
-<div class="payment-box">
+<h3>💳 پارەدان</h3>
 
-<select id="paymentMethod">
-  <option value="">هەڵبژاردن</option>
-  <option value="fastpay">FastPay</option>
-  <option value="fib">FIB</option>
-  <option value="qi">Qi Card</option>
-</select>
+<div style="background:#f1f1f1;padding:10px;border-radius:10px;">
+<b>هۆتێلی هەڵبژێردرا:</b>
+<div id="selectedHotel">هیچ هۆتێلێک هەڵنەبژێردراوە</div>
+</div>
+
+<div class="payRow">
+<div class="payCard" onclick="selectPay('FastPay')">FastPay</div>
+<div class="payCard" onclick="selectPay('FIB')">FIB</div>
+<div class="payCard" onclick="selectPay('QiCard')">Qi Card</div>
+</div>
 
 <div id="account"></div>
 
+<div class="upload">
+📸 وێنەی پارەناردنەکەت بنێرە
 <input type="file">
-<p>وێنەی پارەناردنەکەت بنێرە</p>
-
-<textarea placeholder="تێبینی..."></textarea>
-
 </div>
 
-<!-- 🔙 BACK -->
-<div class="payment-box">
-<a href="https://github.com">گەڕانەوە</a>
+<textarea id="note" placeholder="تێبینی..."></textarea>
+
+<div class="btn" onclick="sendData()">✔️ پارەدان بکە</div>
+
 </div>
 
 <script>
 
-// generate 10 dashboards
-function createCards(id){
-  let container = document.getElementById(id);
-  for(let i=1;i<=10;i++){
-    container.innerHTML += `
-    <div class="card">
-      <div class="grid">
-        <div class="box">ناو: Hotel ${i}</div>
-        <div class="box">⭐ 4.${i}</div>
-        <div class="box">$${100+i}</div>
-        <div class="box">مەکە</div>
-      </div>
-    </div>`;
-  }
+// create hotels
+let html='<div class="grid">';
+for(let i=1;i<=10;i++){
+html+=`
+<div class="card" onclick="selectHotel('Hotel ${i}',${100+i})">
+<div class="box">🏨 Hotel ${i}</div>
+<div class="box">⭐ 4.${i}</div>
+<div class="box">💰 $${100+i}</div>
+<div class="box">📍 Makkah</div>
+</div>`;
+}
+html+='</div>';
+document.getElementById("hotels").innerHTML=html;
+
+// select hotel + scroll
+let selected="";
+function selectHotel(name,price){
+selected=name+" - $"+price;
+document.getElementById("selectedHotel").innerText=selected;
+
+// smooth scroll بۆ پارەدان
+document.getElementById("paymentSection")
+.scrollIntoView({behavior:"smooth"});
 }
 
-createCards("haram-hotels");
-createCards("center-hotels");
-createCards("mahbas-hotels");
-
-// payment numbers (admin editable later)
-const accounts = {
-  fastpay: "0770 000 0000",
-  fib: "0750 000 0000",
-  qi: "0780 000 0000"
+// payment
+function selectPay(method){
+const acc={
+FastPay:"0770 xxx xxx",
+FIB:"0750 xxx xxx",
+QiCard:"0780 xxx xxx"
 };
 
-document.getElementById("paymentMethod").onchange = function(){
-  document.getElementById("account").innerHTML = 
-  "ژمارە: " + accounts[this.value];
-};
+document.getElementById("account").innerText=
+"ژمارە: "+acc[method];
+}
+
+// send
+function sendData(){
+fetch("https://formspree.io/f/mgorjdjr",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+hotel:selected,
+note:document.getElementById("note").value
+})
+}).then(()=>{
+alert("ناردرا ✔️");
+});
+}
 
 </script>
 
