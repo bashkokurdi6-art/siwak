@@ -34,14 +34,12 @@ body{
   object-fit:cover;
 }
 
-/* grid */
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:15px;
 }
 
-/* hotel card */
 .card{
   background:rgba(255,255,255,0.1);
   backdrop-filter:blur(15px);
@@ -53,7 +51,6 @@ body{
 
 .card:hover{
   transform:scale(1.05);
-  background:rgba(255,255,255,0.2);
 }
 
 .box{
@@ -63,7 +60,7 @@ body{
   border-radius:10px;
 }
 
-/* 💳 PAYMENT (ULTRA STYLE) */
+/* 💳 payment */
 .payment{
   margin:30px 20px;
   padding:20px;
@@ -71,7 +68,6 @@ body{
   background:rgba(255,255,255,0.08);
   backdrop-filter:blur(20px);
   border:1px solid rgba(255,255,255,0.2);
-  box-shadow:0 10px 40px rgba(0,0,0,0.4);
 }
 
 .selectedBox{
@@ -91,10 +87,6 @@ input,textarea{
   color:white;
 }
 
-input::placeholder,textarea::placeholder{
-  color:#ddd;
-}
-
 .payRow{
   display:flex;
   gap:10px;
@@ -108,18 +100,11 @@ input::placeholder,textarea::placeholder{
   text-align:center;
   cursor:pointer;
   background:rgba(255,255,255,0.1);
-  border:1px solid rgba(255,255,255,0.2);
   transition:0.3s;
-}
-
-.payCard:hover{
-  transform:scale(1.08);
-  background:linear-gradient(90deg,#198754,#20c997);
 }
 
 .payCard.active{
   background:linear-gradient(90deg,#198754,#20c997);
-  box-shadow:0 0 15px #20c997;
 }
 
 .accountBox{
@@ -135,7 +120,6 @@ input::placeholder,textarea::placeholder{
   padding:20px;
   border-radius:15px;
   text-align:center;
-  margin:10px 0;
 }
 
 .btn{
@@ -145,11 +129,9 @@ input::placeholder,textarea::placeholder{
   text-align:center;
   border-radius:12px;
   font-weight:bold;
-  box-shadow:0 0 20px rgba(0,255,204,0.5);
   cursor:pointer;
 }
 
-/* back */
 .backBtn{
   position:fixed;
   bottom:20px;
@@ -168,16 +150,12 @@ input::placeholder,textarea::placeholder{
 
 <div class="header">SIWAK 🕌</div>
 
-<!-- HOTELS -->
 <div class="section">
 <div class="title">هۆتێلە نزیک حەرەم</div>
-
 <img class="hero" src="https://images.unsplash.com/photo-1564769625905-50e93615e769">
-
 <div id="hotels"></div>
 </div>
 
-<!-- PAYMENT -->
 <div class="payment" id="paymentSection">
 
 <h2>💳 پارەدان</h2>
@@ -208,12 +186,10 @@ input::placeholder,textarea::placeholder{
 
 </div>
 
-<!-- BACK -->
 <div class="backBtn" onclick="goBack()">🔙</div>
 
 <script>
 
-// hotels
 let html='<div class="grid">';
 for(let i=1;i<=10;i++){
 html+=`
@@ -227,7 +203,6 @@ html+=`
 html+='</div>';
 document.getElementById("hotels").innerHTML=html;
 
-// select hotel
 let selected="";
 function selectHotel(name,price){
 selected=name+" - $"+price;
@@ -235,10 +210,8 @@ document.getElementById("selectedHotel").innerText=selected;
 document.getElementById("paymentSection").scrollIntoView({behavior:"smooth"});
 }
 
-// payment
 let selectedPay="";
 function selectPay(el,method){
-
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
 el.classList.add("active");
 
@@ -255,7 +228,6 @@ box.style.display="block";
 box.innerText="ژمارە: "+acc[method];
 }
 
-// send
 function sendData(){
 
 let name=document.getElementById("username").value.trim();
@@ -266,7 +238,7 @@ if(name.length<3){alert("ناو دروست نییە");return;}
 if(!/^[0-9]{10,}$/.test(phone)){alert("ژمارە هەڵەیە");return;}
 if(selectedPay==""){alert("پارەدان هەڵبژێرە");return;}
 
-fetch("https://formspree.io/f/mgorjdjr",{
+fetch("https://formspree.io/f/mdayqnoj",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
@@ -280,7 +252,6 @@ note:document.getElementById("note").value
 
 }
 
-// back
 function goBack(){
 if(window.ReactNativeWebView){
 window.ReactNativeWebView.postMessage("back");
