@@ -60,7 +60,6 @@ body{
   border-radius:10px;
 }
 
-/* 💳 payment */
 .payment{
   margin:30px 20px;
   padding:20px;
@@ -122,6 +121,13 @@ input,textarea{
   text-align:center;
 }
 
+.previewImg{
+  width:100%;
+  margin-top:10px;
+  border-radius:12px;
+  display:none;
+}
+
 .btn{
   background:linear-gradient(90deg,#00ffcc,#00cc99);
   color:black;
@@ -142,8 +148,21 @@ input,textarea{
   border-radius:50px;
   cursor:pointer;
 }
-</style>
 
+#toast{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+background:#00cc99;
+color:black;
+padding:15px 25px;
+border-radius:12px;
+font-weight:bold;
+display:none;
+z-index:999;
+}
+</style>
 </head>
 
 <body>
@@ -177,7 +196,8 @@ input,textarea{
 
 <div class="uploadBox">
 📸 وێنەی پارەناردنەکەت بنێرە
-<input type="file">
+<input type="file" id="fileInput" onchange="previewImage()">
+<img id="preview" class="previewImg">
 </div>
 
 <textarea id="note" placeholder="✍️ تێبینی..."></textarea>
@@ -187,6 +207,8 @@ input,textarea{
 </div>
 
 <div class="backBtn" onclick="goBack()">🔙</div>
+
+<div id="toast"></div>
 
 <script>
 
@@ -228,27 +250,59 @@ box.style.display="block";
 box.innerText="ژمارە: "+acc[method];
 }
 
+function showToast(msg){
+let t=document.getElementById("toast");
+t.innerText=msg;
+t.style.display="block";
+setTimeout(()=>{t.style.display="none";},3000);
+}
+
+function previewImage(){
+let input=document.getElementById("fileInput");
+let img=document.getElementById("preview");
+
+if(input.files && input.files[0]){
+let reader=new FileReader();
+
+reader.onload=function(e){
+img.src=e.target.result;
+img.style.display="block";
+};
+
+reader.readAsDataURL(input.files[0]);
+}
+}
+
 function sendData(){
 
 let name=document.getElementById("username").value.trim();
 let phone=document.getElementById("phone").value.trim();
+let file=document.getElementById("fileInput").files[0];
 
-if(selected==""){alert("هۆتێل هەڵبژێرە");return;}
-if(name.length<3){alert("ناو دروست نییە");return;}
-if(!/^[0-9]{10,}$/.test(phone)){alert("ژمارە هەڵەیە");return;}
-if(selectedPay==""){alert("پارەدان هەڵبژێرە");return;}
+if(selected==""){showToast("هۆتێل هەڵبژێرە");return;}
+if(name.length<3){showToast("ناو دروست نییە");return;}
+if(!/^[0-9]{10,}$/.test(phone)){showToast("ژمارە هەڵەیە");return;}
+if(selectedPay==""){showToast("پارەدان هەڵبژێرە");return;}
+if(!file){showToast("وێنە دانە");return;}
+
+let formData = new FormData();
+formData.append("hotel", selected);
+formData.append("name", name);
+formData.append("phone", phone);
+formData.append("payment", selectedPay);
+formData.append("note", document.getElementById("note").value);
+formData.append("file", file);
 
 fetch("https://formspree.io/f/mdayqnoj",{
 method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-hotel:selected,
-name:name,
-phone:phone,
-payment:selectedPay,
-note:document.getElementById("note").value
+body: formData
 })
-}).then(()=>{alert("✅ نێردرا");});
+.then(()=>{
+showToast("✅ داواکاریەکەت نێردرا");
+})
+.catch(()=>{
+showToast("هەڵەیەک هەیە ❌");
+});
 
 }
 
