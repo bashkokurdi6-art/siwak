@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>SIWAK</title>
 
 <style>
@@ -14,7 +13,6 @@ body{
   color:white;
 }
 
-/* header */
 .header{
   text-align:center;
   padding:25px;
@@ -22,7 +20,6 @@ body{
   font-weight:bold;
 }
 
-/* section */
 .section{ margin:20px; }
 
 .title{
@@ -30,7 +27,6 @@ body{
   font-size:20px;
 }
 
-/* image */
 .hero{
   width:100%;
   height:200px;
@@ -45,7 +41,7 @@ body{
   gap:15px;
 }
 
-/* card */
+/* hotel card */
 .card{
   background:rgba(255,255,255,0.1);
   backdrop-filter:blur(15px);
@@ -67,7 +63,7 @@ body{
   border-radius:10px;
 }
 
-/* 💳 PAYMENT (ثابت لە ژێرەوە) */
+/* 💳 payment */
 .payment{
   margin:30px 20px;
   background:white;
@@ -77,26 +73,54 @@ body{
   box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* pay cards */
+.selectedBox{
+  background:#f1f1f1;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+}
+
 .payRow{
   display:flex;
   gap:10px;
-  margin-top:10px;
+  margin:15px 0;
 }
 
 .payCard{
   flex:1;
-  background:#f1f1f1;
-  padding:12px;
-  border-radius:12px;
+  background:white;
+  padding:14px;
+  border-radius:15px;
   text-align:center;
   cursor:pointer;
   transition:0.3s;
+  font-weight:bold;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
-.payCard:hover{
+.payCard.active{
   background:#198754;
   color:white;
+  transform:scale(1.05);
+}
+
+.accountBox{
+  background:#e9f7ef;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  display:none;
+  font-weight:bold;
+}
+
+.uploadBox{
+  border:2px dashed #ccc;
+  padding:20px;
+  border-radius:15px;
+  text-align:center;
+  margin:10px 0;
 }
 
 /* inputs */
@@ -106,14 +130,6 @@ input,textarea{
   margin:8px 0;
   border-radius:10px;
   border:1px solid #ccc;
-}
-
-/* upload */
-.upload{
-  border:2px dashed #ccc;
-  padding:15px;
-  text-align:center;
-  border-radius:12px;
 }
 
 /* button */
@@ -137,6 +153,7 @@ input,textarea{
 <!-- 🏨 HOTELS -->
 <div class="section">
 <div class="title">هۆتێلە نزیک حەرەم</div>
+
 <img class="hero" src="https://images.unsplash.com/photo-1564769625905-50e93615e769">
 
 <div id="hotels"></div>
@@ -145,27 +162,27 @@ input,textarea{
 <!-- 💳 PAYMENT -->
 <div class="payment" id="paymentSection">
 
-<h3>💳 پارەدان</h3>
+<h2>💳 پارەدان</h2>
 
-<div style="background:#f1f1f1;padding:10px;border-radius:10px;">
-<b>هۆتێلی هەڵبژێردرا:</b>
-<div id="selectedHotel">هیچ هۆتێلێک هەڵنەبژێردراوە</div>
+<div class="selectedBox">
+<span>🏨 هۆتێل:</span>
+<b id="selectedHotel">هیچ هەڵنەبژێردراوە</b>
 </div>
 
 <div class="payRow">
-<div class="payCard" onclick="selectPay('FastPay')">FastPay</div>
-<div class="payCard" onclick="selectPay('FIB')">FIB</div>
-<div class="payCard" onclick="selectPay('QiCard')">Qi Card</div>
+<div class="payCard" onclick="selectPay(this,'FastPay')">FastPay</div>
+<div class="payCard" onclick="selectPay(this,'FIB')">FIB</div>
+<div class="payCard" onclick="selectPay(this,'QiCard')">Qi Card</div>
 </div>
 
-<div id="account"></div>
+<div id="accountBox" class="accountBox"></div>
 
-<div class="upload">
+<div class="uploadBox">
 📸 وێنەی پارەناردنەکەت بنێرە
 <input type="file">
 </div>
 
-<textarea id="note" placeholder="تێبینی..."></textarea>
+<textarea id="note" placeholder="✍️ تێبینی..."></textarea>
 
 <div class="btn" onclick="sendData()">✔️ پارەدان بکە</div>
 
@@ -187,41 +204,53 @@ html+=`
 html+='</div>';
 document.getElementById("hotels").innerHTML=html;
 
-// select hotel + scroll
+// select hotel
 let selected="";
 function selectHotel(name,price){
 selected=name+" - $"+price;
 document.getElementById("selectedHotel").innerText=selected;
 
-// smooth scroll بۆ پارەدان
 document.getElementById("paymentSection")
 .scrollIntoView({behavior:"smooth"});
 }
 
-// payment
-function selectPay(method){
+// select payment
+let selectedPay="";
+function selectPay(el,method){
+
+document.querySelectorAll(".payCard")
+.forEach(c=>c.classList.remove("active"));
+
+el.classList.add("active");
+
+selectedPay=method;
+
 const acc={
 FastPay:"0770 xxx xxx",
 FIB:"0750 xxx xxx",
 QiCard:"0780 xxx xxx"
 };
 
-document.getElementById("account").innerText=
-"ژمارە: "+acc[method];
+let box=document.getElementById("accountBox");
+box.style.display="block";
+box.innerText="ژمارە: "+acc[method];
 }
 
-// send
+// send to Formspree
 function sendData(){
+
 fetch("https://formspree.io/f/mgorjdjr",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
 hotel:selected,
+payment:selectedPay,
 note:document.getElementById("note").value
 })
 }).then(()=>{
 alert("ناردرا ✔️");
 });
+
 }
 
 </script>
