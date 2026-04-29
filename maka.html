@@ -41,7 +41,7 @@ body{
   gap:15px;
 }
 
-/* hotel card */
+/* card */
 .card{
   background:rgba(255,255,255,0.1);
   backdrop-filter:blur(15px);
@@ -63,14 +63,13 @@ body{
   border-radius:10px;
 }
 
-/* 💳 payment */
+/* payment */
 .payment{
   margin:30px 20px;
   background:white;
   color:black;
   padding:20px;
   border-radius:25px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 .selectedBox{
@@ -96,8 +95,6 @@ body{
   text-align:center;
   cursor:pointer;
   transition:0.3s;
-  font-weight:bold;
-  box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
 .payCard.active{
@@ -112,7 +109,6 @@ body{
   border-radius:12px;
   margin-bottom:10px;
   display:none;
-  font-weight:bold;
 }
 
 .uploadBox{
@@ -123,7 +119,6 @@ body{
   margin:10px 0;
 }
 
-/* inputs */
 input,textarea{
   width:100%;
   padding:12px;
@@ -132,7 +127,6 @@ input,textarea{
   border:1px solid #ccc;
 }
 
-/* button */
 .btn{
   background:linear-gradient(90deg,#198754,#20c997);
   color:white;
@@ -141,6 +135,19 @@ input,textarea{
   border-radius:12px;
   cursor:pointer;
   font-weight:bold;
+  margin-top:10px;
+}
+
+/* 🔙 BACK BUTTON */
+.backBtn{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  background:#198754;
+  color:white;
+  padding:12px 15px;
+  border-radius:50px;
+  cursor:pointer;
 }
 </style>
 
@@ -188,9 +195,12 @@ input,textarea{
 
 </div>
 
+<!-- 🔙 BACK BUTTON -->
+<div class="backBtn" onclick="goBack()">🔙</div>
+
 <script>
 
-// create hotels
+// hotels
 let html='<div class="grid">';
 for(let i=1;i<=10;i++){
 html+=`
@@ -214,7 +224,7 @@ document.getElementById("paymentSection")
 .scrollIntoView({behavior:"smooth"});
 }
 
-// select payment
+// payment
 let selectedPay="";
 function selectPay(el,method){
 
@@ -236,9 +246,8 @@ box.style.display="block";
 box.innerText="ژمارە: "+acc[method];
 }
 
-// send to Formspree
+// send
 function sendData(){
-
 fetch("https://formspree.io/f/mgorjdjr",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
@@ -250,7 +259,11 @@ note:document.getElementById("note").value
 }).then(()=>{
 alert("ناردرا ✔️");
 });
+}
 
+// 🔙 BACK FUNCTION (مهم)
+function goBack(){
+window.location.href = "back";
 }
 
 </script>
