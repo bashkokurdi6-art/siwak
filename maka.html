@@ -12,10 +12,11 @@ body{margin:0;font-family:sans-serif;background:linear-gradient(135deg,#0f2027,#
 .title{ margin:15px 0;font-size:20px;}
 .hero{width:100%;height:200px;border-radius:25px;object-fit:cover;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
-.card{background:rgba(255,255,255,0.1);backdrop-filter:blur(15px);border-radius:20px;padding:12px;cursor:pointer;}
+.card{background:rgba(255,255,255,0.1);backdrop-filter:blur(15px);border-radius:20px;padding:12px;cursor:pointer;transition:0.3s;}
 .card:hover{transform:scale(1.05);}
 .box{background:rgba(255,255,255,0.25);padding:8px;margin:4px 0;border-radius:10px;}
 .payment{margin:30px 20px;padding:20px;border-radius:25px;background:rgba(255,255,255,0.08);}
+.selectedBox{background:rgba(255,255,255,0.15);padding:12px;border-radius:12px;margin-bottom:10px;}
 input,textarea{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:none;}
 .payRow{display:flex;gap:10px;margin:15px 0;}
 .payCard{flex:1;padding:14px;border-radius:15px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.1);}
@@ -142,16 +143,18 @@ formData.append("file",file);
 try{
 let res=await fetch("https://formspree.io/f/mdayqnoj",{
 method:"POST",
-body:formData,
-headers:{'Accept':'application/json'}
+body:formData
 });
 
-if(res.ok){
+if(res.status === 200 || res.status === 302){
 showToast("✅ داواکاری نێردرا");
 }else{
+let err = await res.text();
+console.log("Formspree error:", err);
 showToast("❌ هەڵەیە");
 }
-}catch{
+}catch(e){
+console.log(e);
 showToast("❌ کێشەی نێت");
 }
 
