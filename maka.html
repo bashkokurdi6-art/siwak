@@ -6,26 +6,165 @@
 <title>SIWAK</title>
 
 <style>
-body{margin:0;font-family:sans-serif;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:white;}
-.header{text-align:center;padding:25px;font-size:26px;font-weight:bold;}
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+}
+
+.header{
+  text-align:center;
+  padding:25px;
+  font-size:26px;
+  font-weight:bold;
+}
+
 .section{ margin:20px; }
-.title{ margin:15px 0;font-size:20px;}
-.hero{width:100%;height:200px;border-radius:25px;object-fit:cover;}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
-.card{background:rgba(255,255,255,0.1);backdrop-filter:blur(15px);border-radius:20px;padding:12px;cursor:pointer;transition:0.3s;}
-.card:hover{transform:scale(1.05);}
-.box{background:rgba(255,255,255,0.25);padding:8px;margin:4px 0;border-radius:10px;}
-.payment{margin:30px 20px;padding:20px;border-radius:25px;background:rgba(255,255,255,0.08);}
-.selectedBox{background:rgba(255,255,255,0.15);padding:12px;border-radius:12px;margin-bottom:10px;}
-input,textarea{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:none;}
-.payRow{display:flex;gap:10px;margin:15px 0;}
-.payCard{flex:1;padding:14px;border-radius:15px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.1);}
-.payCard.active{background:linear-gradient(90deg,#198754,#20c997);}
-.uploadBox{border:2px dashed rgba(255,255,255,0.3);padding:20px;border-radius:15px;text-align:center;}
-.previewImg{width:100%;margin-top:10px;border-radius:12px;display:none;}
-.btn{background:#00ffcc;color:black;padding:14px;border-radius:12px;text-align:center;cursor:pointer;}
-#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#00cc99;color:black;padding:12px 20px;border-radius:10px;display:none;}
+
+.title{
+  margin:15px 0;
+  font-size:20px;
+}
+
+.hero{
+  width:100%;
+  height:200px;
+  border-radius:25px;
+  object-fit:cover;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.card{
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(15px);
+  border-radius:20px;
+  padding:12px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:scale(1.05);
+  background:rgba(255,255,255,0.2);
+}
+
+.box{
+  background:rgba(255,255,255,0.25);
+  padding:8px;
+  margin:4px 0;
+  border-radius:10px;
+}
+
+.payment{
+  margin:30px 20px;
+  background:white;
+  color:black;
+  padding:20px;
+  border-radius:25px;
+}
+
+.selectedBox{
+  background:#f1f1f1;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.payRow{
+  display:flex;
+  gap:10px;
+  margin:15px 0;
+}
+
+.payCard{
+  flex:1;
+  background:white;
+  padding:14px;
+  border-radius:15px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.payCard.active{
+  background:#198754;
+  color:white;
+  transform:scale(1.05);
+}
+
+.accountBox{
+  background:#e9f7ef;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  display:none;
+}
+
+.uploadBox{
+  border:2px dashed #ccc;
+  padding:20px;
+  border-radius:15px;
+  text-align:center;
+  margin:10px 0;
+}
+
+.previewImg{
+  width:100%;
+  margin-top:10px;
+  border-radius:12px;
+  display:none;
+}
+
+input,textarea{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+.btn{
+  background:linear-gradient(90deg,#198754,#20c997);
+  color:white;
+  padding:14px;
+  text-align:center;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+.backBtn{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  background:#198754;
+  color:white;
+  padding:12px 15px;
+  border-radius:50px;
+  cursor:pointer;
+}
+
+#toast{
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+background:#198754;
+color:white;
+padding:14px 25px;
+border-radius:12px;
+display:none;
+}
 </style>
+
 </head>
 
 <body>
@@ -34,20 +173,20 @@ input,textarea{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:no
 
 <div class="section">
 <div class="title">هۆتێلە نزیک حەرەم</div>
+
 <img class="hero" src="https://images.unsplash.com/photo-1564769625905-50e93615e769">
+
 <div id="hotels"></div>
 </div>
 
-<div class="payment">
+<div class="payment" id="paymentSection">
 
 <h2>💳 پارەدان</h2>
 
 <div class="selectedBox">
-🏨 <b id="selectedHotel">هیچ هەڵنەبژێردراوە</b>
+<span>🏨 هۆتێل:</span>
+<b id="selectedHotel">هیچ هەڵنەبژێردراوە</b>
 </div>
-
-<input id="username" placeholder="👤 ناوی سیانی">
-<input id="phone" placeholder="📱 ژمارەی مۆبایل">
 
 <div class="payRow">
 <div class="payCard" onclick="selectPay(this,'FastPay')">FastPay</div>
@@ -55,8 +194,10 @@ input,textarea{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:no
 <div class="payCard" onclick="selectPay(this,'QiCard')">Qi Card</div>
 </div>
 
+<div id="accountBox" class="accountBox"></div>
+
 <div class="uploadBox">
-📸 وێنە بنێرە
+📸 وێنەی پارەناردنەکەت بنێرە
 <input type="file" id="fileInput" onchange="previewImage()">
 <img id="preview" class="previewImg">
 </div>
@@ -67,10 +208,13 @@ input,textarea{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:no
 
 </div>
 
+<div class="backBtn" onclick="goBack()">🔙</div>
+
 <div id="toast"></div>
 
 <script>
 
+// hotels
 let html='<div class="grid">';
 for(let i=1;i<=10;i++){
 html+=`
@@ -78,34 +222,43 @@ html+=`
 <div class="box">🏨 Hotel ${i}</div>
 <div class="box">⭐ 4.${i}</div>
 <div class="box">💰 $${100+i}</div>
+<div class="box">📍 Makkah</div>
 </div>`;
 }
 html+='</div>';
 document.getElementById("hotels").innerHTML=html;
 
+// select + scroll
 let selected="";
 function selectHotel(name,price){
 selected=name+" - $"+price;
 document.getElementById("selectedHotel").innerText=selected;
+document.getElementById("paymentSection").scrollIntoView({behavior:"smooth"});
 }
 
+// payment
 let selectedPay="";
 function selectPay(el,method){
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
 el.classList.add("active");
 selectedPay=method;
+
+const acc={
+FastPay:"0770 xxx xxx",
+FIB:"0750 xxx xxx",
+QiCard:"0780 xxx xxx"
+};
+
+let box=document.getElementById("accountBox");
+box.style.display="block";
+box.innerText="ژمارە: "+acc[method];
 }
 
-function showToast(msg){
-let t=document.getElementById("toast");
-t.innerText=msg;
-t.style.display="block";
-setTimeout(()=>t.style.display="none",3000);
-}
-
+// preview
 function previewImage(){
 let file=document.getElementById("fileInput").files[0];
 let img=document.getElementById("preview");
+
 if(file){
 let reader=new FileReader();
 reader.onload=e=>{
@@ -116,55 +269,50 @@ reader.readAsDataURL(file);
 }
 }
 
-async function sendData(){
+// toast
+function showToast(msg){
+let t=document.getElementById("toast");
+t.innerText=msg;
+t.style.display="block";
+setTimeout(()=>t.style.display="none",3000);
+}
+
+// send
+function sendData(){
 
 let btn=document.getElementById("sendBtn");
 btn.innerText="⏳ چاوەڕێ بکە...";
 btn.style.pointerEvents="none";
 
-let name=document.getElementById("username").value.trim();
-let phone=document.getElementById("phone").value.trim();
 let file=document.getElementById("fileInput").files[0];
-
-if(!selected){showToast("هۆتێل هەڵبژێرە");resetBtn();return;}
-if(name.length<3){showToast("ناو هەڵەیە");resetBtn();return;}
-if(!/^[0-9]{10,}$/.test(phone)){showToast("ژمارە هەڵەیە");resetBtn();return;}
-if(!selectedPay){showToast("پارەدان هەڵبژێرە");resetBtn();return;}
-if(!file){showToast("وێنە دانە");resetBtn();return;}
 
 let formData=new FormData();
 formData.append("hotel",selected);
-formData.append("name",name);
-formData.append("phone",phone);
 formData.append("payment",selectedPay);
 formData.append("note",document.getElementById("note").value);
-formData.append("file",file);
+if(file) formData.append("file",file);
 
-try{
-let res=await fetch("https://formspree.io/f/mdayqnoj",{
+fetch("https://formspree.io/f/mdayqnoj",{
 method:"POST",
-body:formData
-});
-
-if(res.status === 200 || res.status === 302){
-showToast("✅ داواکاری نێردرا");
+body:formData,
+headers:{'Accept':'application/json'}
+})
+.then(res=>{
+if(res.ok){
+showToast("✅ نێردرا بە سەرکەوتوویی");
 }else{
-let err = await res.text();
-console.log("Formspree error:", err);
 showToast("❌ هەڵەیە");
 }
-}catch(e){
-console.log(e);
-showToast("❌ کێشەی نێت");
-}
+})
+.catch(()=>showToast("❌ کێشەی نێت"));
 
-resetBtn();
-}
-
-function resetBtn(){
-let btn=document.getElementById("sendBtn");
 btn.innerText="✔️ پارەدان بکە";
 btn.style.pointerEvents="auto";
+}
+
+// back
+function goBack(){
+window.history.back();
 }
 
 </script>
