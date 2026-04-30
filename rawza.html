@@ -193,9 +193,17 @@ text-align:center;
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-let gender="",pay="",settings={};
+let gender="",pay="";
+let settings={};
 
-// 🔥 load payment numbers from admin
+// 🔥 popup
+function pop(t){
+msg.innerText=t;
+popup.style.display="flex";
+setTimeout(()=>popup.style.display="none",2500);
+}
+
+// 🔥 load payment settings
 fetch(URL+"/rest/v1/rawza_settings?id=eq.1",{
 headers:{apikey:KEY,Authorization:"Bearer "+KEY}
 })
@@ -204,35 +212,27 @@ headers:{apikey:KEY,Authorization:"Bearer "+KEY}
 settings=d[0]||{};
 });
 
-// popup
-function pop(t){
-msg.innerText=t;
-popup.style.display="flex";
-setTimeout(()=>popup.style.display="none",2500);
-}
-
-// gender
+// 🔥 gender
 function setGender(el,g){
 document.querySelectorAll(".gender div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
 gender=g;
 }
 
-// 🔥 pay + show number
+// 🔥 payment select + show number
 function setPay(el,p){
 document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
 pay=p;
 
-let num =
+acc.innerText="ژمارە: "+(
 p=="FIB"?settings.fib:
 p=="FastPay"?settings.fastpay:
-settings.qicard;
-
-acc.innerText = num ? "ژمارە: "+num : "ژمارە دیاری نەکراوە";
+settings.qicard
+);
 }
 
-// preview
+// 🔥 preview
 visa.onchange=e=>{
 vPrev.src=URL.createObjectURL(e.target.files[0]);
 vPrev.style.display="block";
@@ -243,7 +243,7 @@ pPrev.src=URL.createObjectURL(e.target.files[0]);
 pPrev.style.display="block";
 };
 
-// submit
+// 🔥 submit
 form.onsubmit=async e=>{
 e.preventDefault();
 
@@ -258,21 +258,22 @@ return;
 let vn=Date.now()+"_v_"+v.name;
 let pn=Date.now()+"_p_"+p.name;
 
-// upload
+// upload visa
 await fetch(URL+"/storage/v1/object/rawza/"+vn,{
 method:"POST",
 headers:{apikey:KEY,Authorization:"Bearer "+KEY},
 body:v
 });
 
+// upload payment
 await fetch(URL+"/storage/v1/object/rawza/"+pn,{
 method:"POST",
 headers:{apikey:KEY,Authorization:"Bearer "+KEY},
 body:p
 });
 
-// insert
-let res = await fetch(URL+"/rest/v1/rawza_requests",{
+// save DB (🔥 چاککراو: note هەڵبژێردرا)
+await fetch(URL+"/rest/v1/rawza_requests",{
 method:"POST",
 headers:{
 "Content-Type":"application/json",
@@ -285,20 +286,15 @@ phone:form.phone.value,
 date:date.value,
 time:time.value,
 gender:gender,
-visa_image:URL+"/storage/v1/object/public/rawza/"+vn,
-payment_image:URL+"/storage/v1/object/public/rawza/"+pn,
+visa_image:vn,
+payment_image:pn,
 payment_method:pay,
-note:form.note.value
+note:form.note ? form.note.value : ""
 })
 });
 
-if(res.ok){
 pop("داواکاریەکەت بەسەرکەوتووی نێردرا ❤️");
 form.reset();
-}else{
-let err=await res.text();
-pop("❌ "+err);
-}
 };
 </script>
 
