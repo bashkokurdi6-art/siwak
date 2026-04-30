@@ -8,57 +8,48 @@
 <style>
 *{box-sizing:border-box}
 body{
-margin:0;
-font-family:sans-serif;
+margin:0;font-family:sans-serif;
 background:url("bg.jpg") center/cover fixed;
-color:white;
-padding-top:200px;
+color:white;padding-top:200px;
 }
 body::before{
-content:"";
-position:fixed;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.5);
-z-index:-1;
+content:"";position:fixed;width:100%;height:100%;
+background:rgba(0,0,0,0.5);z-index:-1;
 }
-.section{position:relative;margin:15px;cursor:pointer}
+.section{margin:15px;cursor:pointer;position:relative}
 .section img{width:100%;height:200px;object-fit:cover;border-radius:20px}
 .title{
 position:absolute;bottom:10px;left:50%;
 transform:translateX(-50%);
 background:rgba(0,0,0,0.7);
-padding:10px 20px;border-radius:12px
+padding:10px 20px;border-radius:12px;
 }
 .hotels{display:none;margin:10px}
 .card{
 background:rgba(255,255,255,0.15);
 backdrop-filter:blur(12px);
 padding:15px;margin:12px 0;border-radius:15px;
-cursor:pointer
+cursor:pointer;transition:0.3s;
 }
-.form{
-display:none;
-background:rgba(255,255,255,0.15);
-backdrop-filter:blur(15px);
-margin:15px;padding:18px;border-radius:20px
-}
+.card:hover{transform:scale(1.03)}
+.form{display:none;background:rgba(255,255,255,0.15);
+padding:18px;margin:15px;border-radius:20px}
 input,textarea{
 width:100%;padding:12px;margin:6px 0;border-radius:12px;
-background:rgba(255,255,255,0.2);color:white;border:none
+background:rgba(255,255,255,0.2);color:white;
+border:1px solid rgba(255,255,255,0.3);
 }
 .payRow{display:flex;gap:10px;margin:10px 0}
-.payCard{flex:1;padding:12px;border-radius:12px;background:rgba(255,255,255,0.2);text-align:center;cursor:pointer}
+.payCard{flex:1;padding:12px;border-radius:12px;background:rgba(255,255,255,0.2);cursor:pointer;text-align:center}
 .payCard.active{background:#20c997}
-.accountBox{background:rgba(0,0,0,0.4);padding:10px;border-radius:10px;display:none}
-.uploadBox{border:2px dashed #ccc;padding:15px;border-radius:12px;text-align:center}
+.accountBox{display:none;background:rgba(0,0,0,0.4);padding:10px;border-radius:10px}
+.uploadBox{border:2px dashed rgba(255,255,255,0.4);padding:15px;border-radius:12px;text-align:center}
 #preview{width:100%;display:none;margin-top:10px;border-radius:10px}
-.btn{background:#20c997;padding:12px;border-radius:12px;text-align:center;cursor:pointer}
-.popup{
-position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center
-}
-.popupBox{background:white;color:black;padding:20px;border-radius:15px}
+.btn{background:linear-gradient(90deg,#198754,#20c997);padding:12px;border-radius:12px;cursor:pointer;text-align:center}
+.popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center}
+.popupBox{background:white;color:black;padding:25px;border-radius:20px;text-align:center}
+.loader{border:4px solid #ccc;border-top:4px solid #20c997;border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin:auto}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 
@@ -78,8 +69,9 @@ background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:cente
 
 <form id="formBox" class="form">
 <input type="hidden" id="hotelInput">
-<input name="name" placeholder="ناوی سیانی">
-<input name="phone" placeholder="ژمارەی مۆبایل">
+
+<input name="name" placeholder="ناوی سیانی" required>
+<input name="phone" placeholder="ژمارەی مۆبایل" required>
 
 <div class="payRow">
 <div class="payCard" onclick="selectPay(this,'FIB')">FIB</div>
@@ -90,124 +82,112 @@ background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:cente
 <div id="accountBox" class="accountBox"></div>
 
 <div class="uploadBox">
-📸 وێنە
-<input type="file" onchange="previewImg(event)">
+📸 وێنەی پارەناردن
+<input type="file" id="fileInput" required onchange="previewImg(event)">
 </div>
 
 <img id="preview">
 
 <textarea name="note" placeholder="تێبینی"></textarea>
 
-<button class="btn">✔️ ناردن</button>
+<button class="btn" type="submit">✔️ ناردن</button>
 </form>
 
 <div id="popup" class="popup">
 <div class="popupBox" id="popupContent"></div>
 </div>
 
-<script defer>
+<script>
 
-/* DATA */
-let data = JSON.parse(localStorage.getItem("adminData")) || {
-makkah:[],
-madina:[],
-payments:{FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"}
+// 🔥 14 HOTEL
+let hotelsData=[
+...Array(7).fill().map((_,i)=>({name:"Makkah Hotel "+(i+1),rating:4.5,location:"Makkah",price:120,loc:"Near Haram"})),
+...Array(7).fill().map((_,i)=>({name:"Madina Hotel "+(i+1),rating:4.4,location:"Madina",price:130,loc:"Near Mosque"}))
+];
+
+function render(id,city){
+let html="";
+hotelsData.filter(h=>h.location===city).forEach(h=>{
+html+=`<div class="card" onclick="openForm('${h.name}')">
+<div>🏨 ${h.name}</div>
+<div>⭐ ${h.rating} | 📍 ${h.loc}</div>
+<div style="color:#20c997">💰 $${h.price}</div>
+</div>`;
+});
+document.getElementById(id).innerHTML=html;
 }
 
-/* FIX 14 HOTELS */
-function fix(list,city){
-if(!list || list.length!==14){
-let arr=[]
-for(let i=1;i<=14;i++){
-arr.push({name:city+" Hotel "+i,rating:4.5,price:100+i})
-}
-return arr
-}
-return list
-}
+render("makkah","Makkah");
+render("madina","Madina");
 
-data.makkah = fix(data.makkah,"Makkah")
-data.madina = fix(data.madina,"Madina")
-
-/* 🔥 IMPORTANT FIX */
-localStorage.setItem("adminData", JSON.stringify(data))
-
-/* RENDER */
-function render(id,list){
-let html=""
-list.forEach(h=>{
-html+=`
-<div class="card" onclick="openForm('${h.name}')">
-<b>🏨 ${h.name}</b><br>
-⭐ ${h.rating}<br>
-💰 $${h.price}
-</div>`
-})
-document.getElementById(id).innerHTML=html
-}
-
-render("makkah",data.makkah)
-render("madina",data.madina)
-
-/* TOGGLE */
 function toggle(id){
-let e=document.getElementById(id)
-e.style.display=e.style.display=="block"?"none":"block"
+["makkah","madina"].forEach(i=>{
+document.getElementById(i).style.display="none";
+});
+document.getElementById(id).style.display="block";
 }
 
-/* 🔥 FIX SCROLL */
-function openForm(n){
-document.getElementById("formBox").style.display="block"
-document.getElementById("hotelInput").value=n
-
-document.getElementById("formBox").scrollIntoView({
-behavior:"smooth"
-})
+function openForm(name){
+document.getElementById("formBox").style.display="block";
+document.getElementById("hotelInput").value=name;
+window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 
-/* PAYMENT */
-function selectPay(el,m){
-document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"))
-el.classList.add("active")
+function selectPay(el,method){
+document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
+el.classList.add("active");
 
-let b=document.getElementById("accountBox")
-b.style.display="block"
-b.innerText="ژمارە: "+data.payments[m]
+const acc={FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"};
+let box=document.getElementById("accountBox");
+box.style.display="block";
+box.innerText="ژمارە: "+acc[method];
 }
 
-/* PREVIEW */
 function previewImg(e){
-let img=document.getElementById("preview")
-img.src=URL.createObjectURL(e.target.files[0])
-img.style.display="block"
+let img=document.getElementById("preview");
+img.src=URL.createObjectURL(e.target.files[0]);
+img.style.display="block";
 }
 
-/* SAVE ORDER */
-document.getElementById("formBox").onsubmit=function(e){
-e.preventDefault()
+document.getElementById("formBox").addEventListener("submit",function(e){
+e.preventDefault();
 
-let orders = JSON.parse(localStorage.getItem("orders")) || []
+if(!document.querySelector(".payCard.active")){
+alert("تکایە جۆری پارەدان هەڵبژێرە");
+return;
+}
 
-orders.push({
-hotel:hotelInput.value,
-name:this.name.value,
-phone:this.phone.value,
-note:this.note.value,
-payment:document.querySelector(".active")?.innerText || "",
-status:"pending",
-date:new Date().toLocaleString()
+showPopup("<div class='loader'></div><p>چاوەڕێ بکە...</p>");
+
+// 🔵 Formspree
+fetch("https://formspree.io/f/mqedjear",{method:"POST"});
+
+// 🟢 Supabase
+fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"apikey":"sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k",
+"Authorization":"Bearer sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k"
+},
+body:JSON.stringify({
+hotel:document.getElementById("hotelInput").value,
+name:document.querySelector("[name='name']").value,
+phone:document.querySelector("[name='phone']").value,
+note:document.querySelector("[name='note']").value
 })
+})
+.then(()=>{showPopup("✔️ نێردرا");setTimeout(closePopup,2000);})
+.catch(()=>{showPopup("❌ هەڵە");});
 
-localStorage.setItem("orders",JSON.stringify(orders))
+});
 
-popup("✔️ داواکاریەکەت بە سەرکەوتوویی نێردرا")
+function showPopup(html){
+document.getElementById("popupContent").innerHTML=html;
+document.getElementById("popup").style.display="flex";
 }
-
-/* POPUP */
-function popup(t){
-popupContent.innerText=t
-popup.style.display="flex"
-setTimeout(()=>popup.style.display="none",2000)
+function closePopup(){
+document.getElementById("popup").style.display="none";
 }
 
 </script>
