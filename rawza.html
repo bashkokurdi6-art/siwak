@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+<meta charset="UTF-8">
+<title>Rawza</title>
 
+<style>
+body{
+margin:0;
+font-family:sans-serif;
+background:linear-gradient(#0f2027,#203a43,#2c5364);
+color:white;
+}
+
+.wrap{max-width:420px;margin:auto;padding:20px;}
+
+.card{
+background:rgba(255,255,255,0.08);
+padding:15px;
+border-radius:15px;
+margin-bottom:15px;
+backdrop-filter:blur(10px);
+}
+
+input,select{
+width:100%;
+padding:12px;
+margin-top:8px;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.15);
+color:white;
+}
+
+.pay{display:flex;gap:10px;margin-top:10px;}
+.pay div{
+flex:1;padding:12px;text-align:center;
+background:#333;border-radius:10px;cursor:pointer;
+}
+.pay .active{background:#20c997;}
+
+button{
+width:100%;padding:14px;
+background:#20c997;border:none;
+border-radius:12px;color:white;
+margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<h2>🕌 حجز ڕەوزە</h2>
+
+<form id="form" class="card">
+
+<label>جۆر</label>
+<select id="gender">
+<option>نێر</option>
+<option>مێ</option>
+</select>
+
+<label>ڕۆژ</label>
+<input type="date" id="date">
+
+<label>کات</label>
+<input type="time" id="time">
+
+<label>ناو</label>
+<input id="name">
+
+<label>ژمارە</label>
+<input id="phone">
+
+<label>💳 پارەدان</label>
+<div class="pay">
+<div onclick="setPay(this,'FIB')">FIB</div>
+<div onclick="setPay(this,'FastPay')">FastPay</div>
+<div onclick="setPay(this,'QiCard')">QiCard</div>
+</div>
+
+<input type="file" id="img">
+
+<button>ناردن</button>
+
+</form>
+
+</div>
+
+<script>
+const URL="https://igydtqampcfbvyymlmxg.supabase.co";
+const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+
+let method="";
+
+function setPay(el,m){
+document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
+el.classList.add("active");
+method=m;
+}
+
+form.onsubmit=async e=>{
+e.preventDefault();
+
+let file=img.files[0];
+let nameFile=Date.now()+file.name;
+
+await fetch(URL+"/storage/v1/object/rawza/"+nameFile,{
+method:"POST",
+headers:{apikey:KEY,Authorization:"Bearer "+KEY},
+body:file
+});
+
+await fetch(URL+"/rest/v1/rawza_requests",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+apikey:KEY,
+Authorization:"Bearer "+KEY
+},
+body:JSON.stringify({
+name:name.value,
+phone:phone.value,
+gender:gender.value,
+date:date.value,
+time:time.value,
+payment_method:method,
+payment_image:URL+"/storage/v1/object/public/rawza/"+nameFile
+})
+});
+
+alert("✔️ نێردرا");
+form.reset();
+}
+</script>
+
+</body>
+</html>
