@@ -58,7 +58,6 @@ opacity:0.8;
 <h2>📄 داواکاری ڕەوزە</h2>
 <div id="list">Loading...</div>
 
-<!-- 🔥 پارەدان -->
 <h2>💳 پارەدان</h2>
 <div class="card">
 <input id="fib" placeholder="FIB">
@@ -71,6 +70,15 @@ opacity:0.8;
 <script>
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+
+// 🔥 helper بۆ دروستکردنی لینک
+function fixImg(path){
+if(!path) return "";
+if(path.startsWith("http")) return path;
+
+// 🔥 ناوی bucket ـەکەت لێرە دابنێ
+return URL+"/storage/v1/object/public/rawza/"+path;
+}
 
 // 🔥 LOAD REQUESTS
 async function load(){
@@ -87,6 +95,10 @@ html="هیچ داواکاری نیە";
 }else{
 
 data.forEach(o=>{
+
+let visaImg = fixImg(o.visa_image);
+let payImg  = fixImg(o.payment_image);
+
 html+=`
 <div class="card">
 👤 ${o.name}<br>
@@ -95,8 +107,8 @@ html+=`
 👥 ${o.gender}<br>
 
 <div class="row">
-<img src="${o.visa_image}" onclick="window.open('${o.visa_image}')">
-<img src="${o.payment_image}" onclick="window.open('${o.payment_image}')">
+${visaImg ? `<img src="${visaImg}" onclick="window.open('${visaImg}')">` : ""}
+${payImg ? `<img src="${payImg}" onclick="window.open('${payImg}')">` : ""}
 </div>
 
 <div class="status">
