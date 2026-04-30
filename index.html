@@ -47,14 +47,10 @@ transform:translateX(-50%);
 background:rgba(0,0,0,0.7);
 padding:10px 20px;
 border-radius:12px;
-font-size:18px;
 }
 
 /* hotels */
-.hotels{
-display:none;
-margin:10px;
-}
+.hotels{display:none;margin:10px}
 
 .card{
 background:rgba(255,255,255,0.15);
@@ -71,11 +67,7 @@ transform:scale(1.03);
 background:rgba(255,255,255,0.25);
 }
 
-.hotelName{font-weight:bold}
-.meta{font-size:14px;margin-top:5px}
-.price{color:#20c997;font-weight:bold}
-
-/* 🔥 FORM (GLASS) */
+/* form glass */
 .form{
 display:none;
 background:rgba(255,255,255,0.15);
@@ -85,7 +77,6 @@ margin:15px;
 padding:18px;
 border-radius:20px;
 border:1px solid rgba(255,255,255,0.2);
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 /* inputs */
@@ -99,14 +90,7 @@ color:white;
 border:1px solid rgba(255,255,255,0.3);
 }
 
-input::placeholder,
-textarea::placeholder{
-color:#ddd;
-}
-
 /* payment */
-.payTitle{font-weight:bold;margin-top:10px}
-
 .payRow{display:flex;gap:10px;margin:10px 0}
 
 .payCard{
@@ -114,11 +98,9 @@ flex:1;
 padding:12px;
 border-radius:12px;
 background:rgba(255,255,255,0.2);
-color:white;
 text-align:center;
 cursor:pointer;
 transition:0.3s;
-border:1px solid rgba(255,255,255,0.3);
 }
 
 .payCard.active{
@@ -131,7 +113,6 @@ transform:scale(1.05);
 background:rgba(0,0,0,0.4);
 padding:10px;
 border-radius:10px;
-margin:10px 0;
 display:none;
 }
 
@@ -144,11 +125,10 @@ text-align:center;
 margin:10px 0;
 }
 
-/* preview */
 #preview{
 width:100%;
-margin-top:10px;
 display:none;
+margin-top:10px;
 border-radius:10px;
 }
 
@@ -157,11 +137,49 @@ border-radius:10px;
 background:linear-gradient(90deg,#198754,#20c997);
 color:white;
 padding:12px;
-text-align:center;
 border-radius:12px;
-margin-top:10px;
 cursor:pointer;
-font-weight:bold;
+text-align:center;
+}
+
+/* popup */
+.popup{
+position:fixed;
+top:0;left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+display:none;
+justify-content:center;
+align-items:center;
+}
+
+.popupBox{
+background:white;
+color:black;
+padding:25px;
+border-radius:20px;
+text-align:center;
+animation:pop 0.4s;
+}
+
+@keyframes pop{
+from{transform:scale(0.5);opacity:0}
+to{transform:scale(1);opacity:1}
+}
+
+.loader{
+border:4px solid #ccc;
+border-top:4px solid #20c997;
+border-radius:50%;
+width:30px;
+height:30px;
+animation:spin 1s linear infinite;
+margin:auto;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
 }
 </style>
 </head>
@@ -183,14 +201,12 @@ font-weight:bold;
 <div id="madina" class="hotels"></div>
 
 <!-- FORM -->
-<form id="formBox" class="form" action="https://formspree.io/f/mqedjear" method="POST">
+<form id="formBox" class="form">
 
-<input type="hidden" name="hotel" id="hotelInput">
+<input type="hidden" id="hotelInput">
 
 <input name="name" placeholder="ناوی سیانی" required>
 <input name="phone" placeholder="ژمارەی مۆبایل" required>
-
-<div class="payTitle">💳 پارەدان</div>
 
 <div class="payRow">
 <div class="payCard" onclick="selectPay(this,'FIB')">FIB</div>
@@ -213,27 +229,20 @@ font-weight:bold;
 
 </form>
 
+<!-- POPUP -->
+<div id="popup" class="popup">
+<div class="popupBox" id="popupContent"></div>
+</div>
+
 <script>
 
-let hotelsData = [
-{name:"Hotel 1",rating:"⭐ 4.5",location:"Makkah",price:"$120"},
-{name:"Hotel 2",rating:"⭐ 4.3",location:"Makkah",price:"$150"},
-{name:"Hotel 3",rating:"⭐ 4.6",location:"Makkah",price:"$180"},
-{name:"Hotel 4",rating:"⭐ 4.4",location:"Makkah",price:"$140"},
-{name:"Hotel 5",rating:"⭐ 4.7",location:"Makkah",price:"$200"},
-{name:"Hotel 6",rating:"⭐ 4.2",location:"Makkah",price:"$110"},
-{name:"Hotel 7",rating:"⭐ 4.5",location:"Makkah",price:"$130"}
-];
+// hotels
+let hotels=["Hotel 1","Hotel 2","Hotel 3","Hotel 4","Hotel 5","Hotel 6","Hotel 7"];
 
 function render(id){
 let html="";
-hotelsData.forEach(h=>{
-html+=`
-<div class="card" onclick="openForm('${h.name}')">
-<div class="hotelName">🏨 ${h.name}</div>
-<div class="meta">${h.rating} | 📍 ${h.location}</div>
-<div class="price">${h.price}</div>
-</div>`;
+hotels.forEach(h=>{
+html+=`<div class="card" onclick="openForm('${h}')">🏨 ${h}</div>`;
 });
 document.getElementById(id).innerHTML=html;
 }
@@ -241,23 +250,20 @@ document.getElementById(id).innerHTML=html;
 render("makkah");
 render("madina");
 
+// toggle
 function toggle(id){
 let el=document.getElementById(id);
 el.style.display = el.style.display=="block"?"none":"block";
 }
 
+// open form
 function openForm(name){
 document.getElementById("formBox").style.display="block";
-document.getElementById("hotelInput").value = name;
+document.getElementById("hotelInput").value=name;
 window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 
-function previewImg(e){
-let img=document.getElementById("preview");
-img.src=URL.createObjectURL(e.target.files[0]);
-img.style.display="block";
-}
-
+// payment
 function selectPay(el,method){
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
 el.classList.add("active");
@@ -273,9 +279,46 @@ box.style.display="block";
 box.innerText="ژمارە: "+acc[method];
 }
 
-document.getElementById("formBox").addEventListener("submit",function(){
-setTimeout(()=>{alert("✔️ داواکاریەکەت نێردرا");},500);
+// preview
+function previewImg(e){
+let img=document.getElementById("preview");
+img.src=URL.createObjectURL(e.target.files[0]);
+img.style.display="block";
+}
+
+// submit
+document.getElementById("formBox").addEventListener("submit",function(e){
+
+e.preventDefault();
+
+showPopup("<div class='loader'></div><p>چاوەڕێ بکە...</p>");
+
+fetch("https://formspree.io/f/mqedjear",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+hotel:document.getElementById("hotelInput").value,
+name:document.querySelector("[name='name']").value,
+phone:document.querySelector("[name='phone']").value,
+note:document.querySelector("[name='note']").value
+})
+})
+.then(()=>{
+showPopup("✔️ داواکاریەکەت نێردرا بە سەرکەوتوویی");
+setTimeout(()=>{closePopup()},2000);
 });
+});
+
+// popup
+function showPopup(html){
+let p=document.getElementById("popup");
+document.getElementById("popupContent").innerHTML=html;
+p.style.display="flex";
+}
+
+function closePopup(){
+document.getElementById("popup").style.display="none";
+}
 
 </script>
 
