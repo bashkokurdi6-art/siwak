@@ -1,1 +1,70 @@
 
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+<meta charset="UTF-8">
+<title>Admin Rawza</title>
+
+<style>
+body{background:#111;color:white;font-family:sans-serif;padding:20px}
+.card{background:#1c1c1c;padding:15px;margin:10px 0;border-radius:10px}
+img{width:100%;max-height:200px;object-fit:cover;margin-top:10px}
+button{padding:10px;margin:5px;border:none;border-radius:6px}
+.ok{background:#20c997}
+.no{background:#dc3545}
+</style>
+</head>
+
+<body>
+
+<h2>🕌 داواکاری ڕەوزە</h2>
+<div id="list"></div>
+
+<script>
+const URL="https://igydtqampcfbvyymlmxg.supabase.co";
+const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+
+async function load(){
+let r=await fetch(URL+"/rest/v1/rawza_requests?select=*&order=id.desc",{
+headers:{apikey:KEY,Authorization:"Bearer "+KEY}
+});
+let d=await r.json();
+
+let html="";
+d.forEach(o=>{
+html+=`
+<div class="card">
+👤 ${o.name}<br>
+📞 ${o.phone}<br>
+👥 ${o.gender}<br>
+📅 ${o.date} - ${o.time}<br>
+
+<img src="${o.payment_image}">
+
+<button class="ok" onclick="setStatus(${o.id},'approved')">✔️</button>
+<button class="no" onclick="setStatus(${o.id},'rejected')">❌</button>
+
+<div>${o.status || "pending"}</div>
+</div>`;
+});
+list.innerHTML=html;
+}
+
+async function setStatus(id,s){
+await fetch(URL+"/rest/v1/rawza_requests?id=eq."+id,{
+method:"PATCH",
+headers:{
+"Content-Type":"application/json",
+apikey:KEY,
+Authorization:"Bearer "+KEY
+},
+body:JSON.stringify({status:s})
+});
+load();
+}
+
+load();
+</script>
+
+</body>
+</html>
