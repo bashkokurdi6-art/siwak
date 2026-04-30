@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ADMIN</title>
+<style>
+body{font-family:sans-serif;padding:20px;background:#111;color:white}
+input{width:100%;padding:8px;margin:5px 0}
+.card{background:#222;padding:15px;margin:10px 0;border-radius:10px}
+button{padding:10px;background:#20c997;color:white;border:none;border-radius:8px}
+</style>
+</head>
+
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<div id="admin"></div>
+
+<button onclick="save()">💾 Save</button>
+
+<script>
+
+let hotels = JSON.parse(localStorage.getItem("hotels")) || [
+{name:"Hotel 1",rating:4.5,location:"Makkah",price:120},
+{name:"Hotel 2",rating:4.3,location:"Makkah",price:150},
+{name:"Hotel 3",rating:4.6,location:"Makkah",price:180},
+{name:"Hotel 4",rating:4.4,location:"Makkah",price:140},
+{name:"Hotel 5",rating:4.7,location:"Makkah",price:200},
+{name:"Hotel 6",rating:4.2,location:"Makkah",price:110},
+{name:"Hotel 7",rating:4.5,location:"Makkah",price:130}
+];
+
+function render(){
+let html="";
+hotels.forEach((h,i)=>{
+html+=`
+<div class="card">
+<input value="${h.name}" onchange="update(${i},'name',this.value)">
+<input value="${h.rating}" onchange="update(${i},'rating',this.value)">
+<input value="${h.location}" onchange="update(${i},'location',this.value)">
+<input value="${h.price}" onchange="update(${i},'price',this.value)">
+</div>
+`;
+});
+document.getElementById("admin").innerHTML=html;
+}
+
+function update(i,key,val){
+hotels[i][key]=val;
+}
+
+function save(){
+localStorage.setItem("hotels",JSON.stringify(hotels));
+alert("Saved ✔️");
+}
+
+render();
+
+</script>
+
+</body>
+</html>
