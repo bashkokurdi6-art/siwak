@@ -172,7 +172,6 @@ text-align:center;
 <div onclick="setPay(this,'QiCard')">QiCard</div>
 </div>
 
-<!-- 🔥 ژمارەی پارەدان -->
 <div id="acc" style="margin-top:10px;font-size:13px;"></div>
 
 <input type="file" id="payimg" required>
@@ -196,7 +195,6 @@ const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 let gender="",pay="";
 let settings={};
 
-// 🔥 popup
 function pop(t){
 msg.innerText=t;
 popup.style.display="flex";
@@ -212,14 +210,14 @@ headers:{apikey:KEY,Authorization:"Bearer "+KEY}
 settings=d[0]||{};
 });
 
-// 🔥 gender
+// gender
 function setGender(el,g){
 document.querySelectorAll(".gender div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
 gender=g;
 }
 
-// 🔥 payment select + show number
+// payment
 function setPay(el,p){
 document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
@@ -232,7 +230,7 @@ settings.qicard
 );
 }
 
-// 🔥 preview
+// preview
 visa.onchange=e=>{
 vPrev.src=URL.createObjectURL(e.target.files[0]);
 vPrev.style.display="block";
@@ -243,7 +241,7 @@ pPrev.src=URL.createObjectURL(e.target.files[0]);
 pPrev.style.display="block";
 };
 
-// 🔥 submit
+// submit
 form.onsubmit=async e=>{
 e.preventDefault();
 
@@ -258,21 +256,21 @@ return;
 let vn=Date.now()+"_v_"+v.name;
 let pn=Date.now()+"_p_"+p.name;
 
-// upload visa
-await fetch(URL+"/storage/v1/object/rawza/"+vn,{
+// ✅ upload visa
+await fetch(URL+"/storage/v1/object/request_uploads/"+vn,{
 method:"POST",
 headers:{apikey:KEY,Authorization:"Bearer "+KEY},
 body:v
 });
 
-// upload payment
-await fetch(URL+"/storage/v1/object/rawza/"+pn,{
+// ✅ upload payment
+await fetch(URL+"/storage/v1/object/payment-screenshots/"+pn,{
 method:"POST",
 headers:{apikey:KEY,Authorization:"Bearer "+KEY},
 body:p
 });
 
-// save DB (🔥 چاککراو: note هەڵبژێردرا)
+// ✅ save DB (فایل ناو تەنها)
 await fetch(URL+"/rest/v1/rawza_requests",{
 method:"POST",
 headers:{
@@ -286,10 +284,8 @@ phone:form.phone.value,
 date:date.value,
 time:time.value,
 gender:gender,
-
-visa_image: URL+"/storage/v1/object/public/rawza/"+vn,
-payment_image: URL+"/storage/v1/object/public/rawza/"+pn,
-
+visa_image: vn,
+payment_image: pn,
 payment_method:pay,
 note:form.note.value
 })
