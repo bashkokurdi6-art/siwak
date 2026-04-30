@@ -13,6 +13,7 @@ margin:0;
 font-family:sans-serif;
 background:url("bg.jpg") center/cover fixed;
 color:white;
+padding-top:200px;
 }
 
 body::before{
@@ -64,7 +65,6 @@ transform:scale(1.03);
 background:rgba(255,255,255,0.25);
 }
 
-/* ===== FORM (هەمانە) ===== */
 .form{
 display:none;
 background:rgba(255,255,255,0.15);
@@ -169,21 +169,18 @@ to{transform:rotate(360deg)}
 
 <body>
 
-<!-- MAKKA -->
 <div class="section" onclick="toggle('makkah')">
 <img src="kaaba.jpg">
 <div class="title">هوتێلەکانی مککە</div>
 </div>
 <div id="makkah" class="hotels"></div>
 
-<!-- MADINA -->
 <div class="section" onclick="toggle('madina')">
 <img src="madina.jpg">
 <div class="title">هوتێلەکانی مەدینە</div>
 </div>
 <div id="madina" class="hotels"></div>
 
-<!-- FORM -->
 <form id="formBox" class="form">
 
 <input type="hidden" id="hotelInput">
@@ -212,15 +209,13 @@ to{transform:rotate(360deg)}
 
 </form>
 
-<!-- POPUP -->
 <div id="popup" class="popup">
 <div class="popupBox" id="popupContent"></div>
 </div>
 
 <script>
 
-/* 🔥 تەنها ئەم بەشە گۆڕدرا */
-let hotelsData = [
+let hotelsData=[
 {name:"Hotel 1",rating:4.5,location:"Makkah",price:120},
 {name:"Hotel 2",rating:4.3,location:"Makkah",price:150},
 {name:"Hotel 3",rating:4.6,location:"Makkah",price:180},
@@ -233,17 +228,11 @@ let hotelsData = [
 function render(id){
 let html="";
 hotelsData.forEach(h=>{
-html+=`
-<div class="card" onclick="openForm('${h.name}')">
+html+=`<div class="card" onclick="openForm('${h.name}')">
 <div style="font-weight:bold">🏨 ${h.name}</div>
-<div style="font-size:14px;opacity:0.9">
-⭐ ${h.rating} | 📍 ${h.location}
-</div>
-<div style="color:#20c997;font-weight:bold">
-💰 $${h.price} / night
-</div>
-</div>
-`;
+<div style="font-size:14px;opacity:0.9">⭐ ${h.rating} | 📍 ${h.location}</div>
+<div style="color:#20c997;font-weight:bold">💰 $${h.price}</div>
+</div>`;
 });
 document.getElementById(id).innerHTML=html;
 }
@@ -251,11 +240,9 @@ document.getElementById(id).innerHTML=html;
 render("makkah");
 render("madina");
 
-/* ===== بەشەکانی تر هەمانە ===== */
-
 function toggle(id){
 let el=document.getElementById(id);
-el.style.display = el.style.display=="block"?"none":"block";
+el.style.display=el.style.display=="block"?"none":"block";
 }
 
 function openForm(name){
@@ -268,12 +255,7 @@ function selectPay(el,method){
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
 el.classList.add("active");
 
-const acc={
-FIB:"0750 XXX XXX",
-FastPay:"0770 XXX XXX",
-QiCard:"0780 XXX XXX"
-};
-
+const acc={FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"};
 let box=document.getElementById("accountBox");
 box.style.display="block";
 box.innerText="ژمارە: "+acc[method];
@@ -285,6 +267,7 @@ img.src=URL.createObjectURL(e.target.files[0]);
 img.style.display="block";
 }
 
+/* 🔥 تەنها ئەمە زیادکرا */
 document.getElementById("formBox").addEventListener("submit",function(e){
 
 e.preventDefault();
@@ -293,7 +276,9 @@ showPopup("<div class='loader'></div><p>چاوەڕێ بکە...</p>");
 
 fetch("https://formspree.io/f/mqedjear",{
 method:"POST",
-headers:{"Content-Type":"application/json"},
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify({
 hotel:document.getElementById("hotelInput").value,
 name:document.querySelector("[name='name']").value,
@@ -302,9 +287,10 @@ note:document.querySelector("[name='note']").value
 })
 })
 .then(()=>{
-showPopup("✔️ داواکاریەکەت نێردرا");
+showPopup("✔️ نێردرا بە سەرکەوتوویی");
 setTimeout(()=>{closePopup()},2000);
 });
+
 });
 
 function showPopup(html){
