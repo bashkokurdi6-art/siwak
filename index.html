@@ -107,14 +107,14 @@ background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:cente
 
 <script>
 
-/* ===== DATA ===== */
+/* DATA */
 let data = JSON.parse(localStorage.getItem("adminData")) || {
 makkah:[],
 madina:[],
 payments:{FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"}
 }
 
-/* ===== FIX 14 HOTELS ===== */
+/* FIX 14 HOTELS */
 function fix(list,city){
 if(!list || list.length!==14){
 let arr=[]
@@ -126,10 +126,13 @@ return arr
 return list
 }
 
-data.makkah=fix(data.makkah,"Makkah")
-data.madina=fix(data.madina,"Madina")
+data.makkah = fix(data.makkah,"Makkah")
+data.madina = fix(data.madina,"Madina")
 
-/* ===== RENDER ===== */
+/* 🔥 IMPORTANT FIX */
+localStorage.setItem("adminData", JSON.stringify(data))
+
+/* RENDER */
 function render(id,list){
 let html=""
 list.forEach(h=>{
@@ -146,18 +149,23 @@ document.getElementById(id).innerHTML=html
 render("makkah",data.makkah)
 render("madina",data.madina)
 
-/* ===== UI ===== */
+/* TOGGLE */
 function toggle(id){
 let e=document.getElementById(id)
 e.style.display=e.style.display=="block"?"none":"block"
 }
 
+/* 🔥 FIX SCROLL */
 function openForm(n){
 document.getElementById("formBox").style.display="block"
 document.getElementById("hotelInput").value=n
+
+document.getElementById("formBox").scrollIntoView({
+behavior:"smooth"
+})
 }
 
-/* ===== PAYMENT ===== */
+/* PAYMENT */
 function selectPay(el,m){
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"))
 el.classList.add("active")
@@ -167,14 +175,14 @@ b.style.display="block"
 b.innerText="ژمارە: "+data.payments[m]
 }
 
-/* ===== PREVIEW ===== */
+/* PREVIEW */
 function previewImg(e){
 let img=document.getElementById("preview")
 img.src=URL.createObjectURL(e.target.files[0])
 img.style.display="block"
 }
 
-/* ===== SAVE ORDER ===== */
+/* SAVE ORDER */
 document.getElementById("formBox").onsubmit=function(e){
 e.preventDefault()
 
@@ -195,7 +203,7 @@ localStorage.setItem("orders",JSON.stringify(orders))
 popup("✔️ نێردرا\nStatus: pending")
 }
 
-/* ===== POPUP ===== */
+/* POPUP */
 function popup(t){
 popupContent.innerText=t
 popup.style.display="flex"
