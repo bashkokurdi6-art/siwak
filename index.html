@@ -215,7 +215,8 @@ to{transform:rotate(360deg)}
 
 <script>
 
-let hotelsData=[
+/* admin data */
+let hotelsData = JSON.parse(localStorage.getItem("hotels")) || [
 {name:"Hotel 1",rating:4.5,location:"Makkah",price:120},
 {name:"Hotel 2",rating:4.3,location:"Makkah",price:150},
 {name:"Hotel 3",rating:4.6,location:"Makkah",price:180},
@@ -267,7 +268,7 @@ img.src=URL.createObjectURL(e.target.files[0]);
 img.style.display="block";
 }
 
-/* 🔥 تەنها ئەمە زیادکرا */
+/* formspree */
 document.getElementById("formBox").addEventListener("submit",function(e){
 
 e.preventDefault();
