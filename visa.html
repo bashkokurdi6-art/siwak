@@ -1,1 +1,126 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visa</title>
 
+<style>
+body{
+margin:0;font-family:sans-serif;
+background:url("bg.jpg") center/cover fixed;
+color:white;padding:20px;
+}
+.box{background:rgba(0,0,0,0.6);padding:15px;border-radius:12px;margin:10px 0}
+input,textarea,select{
+width:100%;padding:10px;margin:6px 0;border-radius:10px;border:none
+}
+.pay{display:flex;gap:10px}
+.pay div{flex:1;padding:10px;background:#333;text-align:center;border-radius:8px;cursor:pointer}
+.pay .active{background:#20c997}
+.btn{background:#20c997;padding:12px;border:none;border-radius:10px;width:100%}
+img{width:100%;margin-top:10px;border-radius:10px}
+</style>
+</head>
+
+<body>
+
+<h2>📄 ڤیزە</h2>
+
+<div class="box">
+<select id="visaType">
+<option value="3m">سێ مانگی</option>
+<option value="1y">١ ساڵی</option>
+</select>
+
+<div id="priceBox">...</div>
+</div>
+
+<form id="form">
+
+<input name="name" placeholder="ناوی سیانی" required>
+<input name="phone" placeholder="ژمارەی مۆبایل" required>
+
+<input type="file" id="passport" required>
+
+<textarea name="note" placeholder="تێبینی"></textarea>
+
+<div class="pay">
+<div onclick="setPay(this,'FIB')">FIB</div>
+<div onclick="setPay(this,'FastPay')">FastPay</div>
+<div onclick="setPay(this,'QiCard')">QiCard</div>
+</div>
+
+<div id="acc"></div>
+
+<input type="file" id="paymentImg" required>
+
+<button class="btn">ناردن</button>
+
+</form>
+
+<script>
+const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+const URL="https://igydtqampcfbvyymlmxg.supabase.co";
+
+let settings={},payMethod="";
+
+// load settings
+fetch(URL+"/rest/v1/visa_settings?id=eq.1",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
+.then(r=>r.json()).then(d=>{
+settings=d[0];
+updatePrice();
+});
+
+function updatePrice(){
+let t=document.getElementById("visaType").value;
+document.getElementById("priceBox").innerText="💰 "+(t=="3m"?settings.price_3m:settings.price_1y);
+}
+
+document.getElementById("visaType").onchange=updatePrice;
+
+function setPay(el,m){
+document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
+el.classList.add("active");
+payMethod=m;
+let map={FIB:settings.fib,FastPay:settings.fastpay,QiCard:settings.qicard};
+document.getElementById("acc").innerText="ژمارە: "+map[m];
+}
+
+// submit
+document.getElementById("form").onsubmit=e=>{
+e.preventDefault();
+
+let pFile=document.getElementById("passport").files[0];
+let payFile=document.getElementById("paymentImg").files[0];
+
+let pName=Date.now()+"_p_"+pFile.name;
+let payName=Date.now()+"_pay_"+payFile.name;
+
+// upload passport
+fetch(URL+"/storage/v1/object/visa/"+pName,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY},body:pFile})
+.then(()=>{
+fetch(URL+"/storage/v1/object/visa/"+payName,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY},body:payFile})
+.then(()=>{
+
+fetch(URL+"/rest/v1/visa_requests",{
+method:"POST",
+headers:{"Content-Type":"application/json",apikey:KEY,Authorization:"Bearer "+KEY},
+body:JSON.stringify({
+name:document.querySelector("[name='name']").value,
+phone:document.querySelector("[name='phone']").value,
+note:document.querySelector("[name='note']").value,
+passport_image:URL+"/storage/v1/object/public/visa/"+pName,
+payment_image:URL+"/storage/v1/object/public/visa/"+payName,
+payment_method:payMethod,
+visa_type:document.getElementById("visaType").value,
+price:document.getElementById("priceBox").innerText
+})
+}).then(()=>alert("✔️ نێردرا"));
+});
+});
+}
+</script>
+
+</body>
+</html>
