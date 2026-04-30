@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ku">
 <head>
@@ -8,8 +7,9 @@
 <style>
 body{background:#111;color:white;font-family:sans-serif;padding:20px}
 .card{background:#1c1c1c;padding:15px;margin:10px 0;border-radius:10px}
-img{width:100%;max-height:200px;object-fit:cover;margin-top:10px}
-button{padding:10px;margin:5px;border:none;border-radius:6px}
+img{width:120px;border-radius:10px;margin-top:10px}
+.row{display:flex;gap:10px}
+button{padding:8px;border:none;border-radius:6px}
 .ok{background:#20c997}
 .no{background:#dc3545}
 </style>
@@ -17,36 +17,39 @@ button{padding:10px;margin:5px;border:none;border-radius:6px}
 
 <body>
 
-<h2>🕌 داواکاری ڕەوزە</h2>
-<div id="list"></div>
+<h2>📄 داواکاری ڕەوزە</h2>
+<div id="list">Loading...</div>
 
 <script>
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
 async function load(){
-let r=await fetch(URL+"/rest/v1/rawza_requests?select=*&order=id.desc",{
+let res=await fetch(URL+"/rest/v1/rawza_requests?select=*&order=id.desc",{
 headers:{apikey:KEY,Authorization:"Bearer "+KEY}
 });
-let d=await r.json();
+let data=await res.json();
 
 let html="";
-d.forEach(o=>{
+
+data.forEach(o=>{
 html+=`
 <div class="card">
 👤 ${o.name}<br>
 📞 ${o.phone}<br>
+📅 ${o.date} | ${o.time}<br>
 👥 ${o.gender}<br>
-📅 ${o.date} - ${o.time}<br>
 
+<div class="row">
+<img src="${o.visa_image}">
 <img src="${o.payment_image}">
+</div>
 
 <button class="ok" onclick="setStatus(${o.id},'approved')">✔️</button>
 <button class="no" onclick="setStatus(${o.id},'rejected')">❌</button>
-
-<div>${o.status || "pending"}</div>
 </div>`;
 });
+
 list.innerHTML=html;
 }
 
