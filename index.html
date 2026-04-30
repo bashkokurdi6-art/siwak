@@ -13,14 +13,12 @@ margin:0;
 font-family:sans-serif;
 
 /* 🔥 BACKGROUND */
-background-image:url("bg.jpg");
+background:url("https://raw.githubusercontent.com/bashkokurdi6-art/siwak/main/bg.jpg") no-repeat center center fixed;
 background-size:cover;
-background-position:center;
-background-attachment:fixed;
 color:white;
 }
 
-/* overlay بۆ ڕوونبوون */
+/* overlay */
 body::before{
 content:"";
 position:fixed;
@@ -28,7 +26,7 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.5);
+background:rgba(0,0,0,0.45);
 z-index:-1;
 }
 
@@ -36,29 +34,51 @@ z-index:-1;
 .header{
 text-align:center;
 padding:20px;
-font-size:24px;
+font-size:26px;
 font-weight:bold;
+background:rgba(0,0,0,0.3);
+backdrop-filter:blur(10px);
+}
+
+/* search */
+.search{
+margin:15px;
+}
+
+.search input{
+width:100%;
+padding:12px;
+border-radius:12px;
+border:none;
+outline:none;
 }
 
 /* grid */
 .grid{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:10px;
+gap:12px;
 padding:10px;
 }
 
 /* card */
 .card{
-background:rgba(255,255,255,0.1);
-backdrop-filter:blur(10px);
-border-radius:15px;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(12px);
+border-radius:20px;
 overflow:hidden;
+cursor:pointer;
+transition:0.3s;
+border:1px solid rgba(255,255,255,0.2);
+}
+
+.card:hover{
+transform:scale(1.04);
 }
 
 .card img{
 width:100%;
-height:120px;
+height:130px;
 object-fit:cover;
 }
 
@@ -66,15 +86,20 @@ object-fit:cover;
 padding:10px;
 }
 
-.price{color:#20c997}
+.price{
+color:#20c997;
+font-weight:bold;
+}
 
-/* booking box */
+/* booking */
 .booking{
-background:white;
+background:rgba(255,255,255,0.9);
+backdrop-filter:blur(10px);
 color:black;
-margin:10px;
-padding:10px;
-border-radius:15px;
+margin:15px;
+padding:15px;
+border-radius:20px;
+animation:fadeUp 0.8s ease;
 }
 
 input{
@@ -86,13 +111,25 @@ border:1px solid #ccc;
 }
 
 .btn{
-background:#198754;
+background:linear-gradient(90deg,#198754,#20c997);
 color:white;
-padding:12px;
+padding:14px;
 text-align:center;
-border-radius:10px;
+border-radius:12px;
 margin-top:10px;
 cursor:pointer;
+font-weight:bold;
+transition:0.3s;
+}
+
+.btn:hover{
+transform:scale(1.05);
+}
+
+/* animation */
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(30px)}
+to{opacity:1;transform:translateY(0)}
 }
 </style>
 </head>
@@ -101,31 +138,36 @@ cursor:pointer;
 
 <div class="header">SIWAK 🕌</div>
 
+<div class="search">
+<input placeholder="🔍 گەڕان بۆ هۆتێل..." onkeyup="search(this.value)">
+</div>
+
 <div id="hotels" class="grid"></div>
 
 <div class="booking">
-<b id="selected">هیچ</b>
+<b id="selected">هیچ هەڵنەبژێردراوە</b>
 
 <input type="date" id="in">
 <input type="date" id="out">
 
-<div class="btn" onclick="book()">✔️ حجز</div>
+<div class="btn" onclick="book()">✔️ حجز بکە</div>
 </div>
 
 <script>
 
-// hotels
 let hotels=[
 {n:"Swissotel",p:200,img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"},
 {n:"Hilton",p:180,img:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"},
-{n:"Pullman",p:150,img:"https://images.unsplash.com/photo-1566073771259-6a8506099945"}
+{n:"Pullman",p:150,img:"https://images.unsplash.com/photo-1566073771259-6a8506099945"},
+{n:"Anjum",p:120,img:"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b"}
 ];
 
 let selected="";
 
 // render
+function render(list){
 let out="";
-hotels.forEach(h=>{
+list.forEach(h=>{
 out+=`
 <div class="card" onclick="select('${h.n}',${h.p})">
 <img src="${h.img}">
@@ -136,17 +178,28 @@ out+=`
 </div>`;
 });
 document.getElementById("hotels").innerHTML=out;
+}
+
+// search
+function search(val){
+let f=hotels.filter(h=>h.n.toLowerCase().includes(val.toLowerCase()));
+render(f);
+}
 
 // select
 function select(n,p){
 selected=n+" - $"+p;
 document.getElementById("selected").innerText=selected;
+
+window.scrollTo({top:500,behavior:"smooth"});
 }
 
 // book
 function book(){
-alert("✔️ حجز کرا: "+selected);
+alert("✔️ حجز کرا:\n"+selected);
 }
+
+render(hotels);
 
 </script>
 
