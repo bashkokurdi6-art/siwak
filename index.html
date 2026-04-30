@@ -99,27 +99,48 @@ border:1px solid rgba(255,255,255,0.3);
 
 <script>
 
-// 🔥 14 HOTEL
-let hotelsData=[
-...Array(7).fill().map((_,i)=>({name:"Makkah Hotel "+(i+1),rating:4.5,location:"Makkah",price:120,loc:"Near Haram"})),
-...Array(7).fill().map((_,i)=>({name:"Madina Hotel "+(i+1),rating:4.4,location:"Madina",price:130,loc:"Near Mosque"}))
-];
+const API_HOTELS="https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/hotels?select=*";
+const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-function render(id,city){
+// 🔥 load hotels from supabase
+function loadHotels(){
+
+fetch(API_HOTELS,{
+headers:{
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+}
+})
+.then(res=>res.json())
+.then(data=>{
+
+render("makkah","Makkah",data);
+render("madina","Madina",data);
+
+});
+
+}
+
+// 🔥 render
+function render(id,city,data){
 let html="";
-hotelsData.filter(h=>h.location===city).forEach(h=>{
+
+data.filter(h=>h.city===city).forEach(h=>{
 html+=`<div class="card" onclick="openForm('${h.name}')">
 <div>🏨 ${h.name}</div>
 <div>⭐ ${h.rating} | 📍 ${h.loc}</div>
 <div style="color:#20c997">💰 $${h.price}</div>
 </div>`;
 });
+
 document.getElementById(id).innerHTML=html;
 }
 
-render("makkah","Makkah");
-render("madina","Madina");
+// 🔥 start
+loadHotels();
 
+
+// 👇 ئەمانە هەمانن (دەست مەدە)
 function toggle(id){
 ["makkah","madina"].forEach(i=>{
 document.getElementById(i).style.display="none";
@@ -159,10 +180,10 @@ return;
 
 showPopup("<div class='loader'></div><p>چاوەڕێ بکە...</p>");
 
-// 🔵 Formspree
+// Formspree
 fetch("https://formspree.io/f/mqedjear",{method:"POST"});
 
-// 🟢 Supabase
+// Supabase orders
 fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders",{
 method:"POST",
 headers:{
@@ -191,6 +212,5 @@ document.getElementById("popup").style.display="none";
 }
 
 </script>
-
 </body>
 </html>
