@@ -286,10 +286,12 @@ phone:form.phone.value,
 date:date.value,
 time:time.value,
 gender:gender,
-visa_image:vn,
-payment_image:pn,
+
+visa_image: URL+"/storage/v1/object/public/rawza/"+vn,
+payment_image: URL+"/storage/v1/object/public/rawza/"+pn,
+
 payment_method:pay,
-note:form.note ? form.note.value : ""
+note:form.note.value
 })
 });
 
