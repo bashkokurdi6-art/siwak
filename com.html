@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دەربارە</title>
+
+<style>
+body{
+margin:0;
+font-family:sans-serif;
+background:url("bg.jpg") center/cover fixed;
+color:white;
+}
+
+.overlay{
+background:rgba(0,0,0,0.75);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+padding:20px;
+text-align:center;
+}
+
+/* box */
+.card{
+background:rgba(255,255,255,0.08);
+padding:25px;
+border-radius:20px;
+backdrop-filter:blur(10px);
+box-shadow:0 0 20px rgba(0,0,0,0.4);
+max-width:400px;
+}
+
+/* title */
+h2{
+margin-bottom:15px;
+}
+
+/* list */
+ul{
+list-style:none;
+padding:0;
+line-height:2;
+font-size:16px;
+}
+
+/* counter */
+.counter{
+margin-top:20px;
+font-size:18px;
+}
+
+/* time */
+.time{
+margin-top:10px;
+font-size:14px;
+opacity:0.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+<div class="card">
+
+<h2>🌙 دەربارەی ئەپ</h2>
+
+<ul>
+<li>📱 بەڕێوبەر و جێبەجێکاری ئەپ</li>
+<li>🕌 حاجی بەشیر برادۆستی</li>
+</ul>
+
+<div class="counter">
+👁 ژمارەی سەردان: <span id="views">0</span>
+</div>
+
+<div class="time">
+📅 زاینی: <span id="gregorian"></span><br>
+🕌 هیجری: <span id="hijri"></span><br>
+⏰ کات: <span id="clock"></span>
+</div>
+
+</div>
+
+</div>
+
+<script>
+// 🔥 view counter (local)
+let views = localStorage.getItem("views") || 0;
+views++;
+localStorage.setItem("views", views);
+document.getElementById("views").innerText = views;
+
+// 🔥 clock
+function updateTime(){
+let now = new Date();
+
+document.getElementById("clock").innerText =
+now.toLocaleTimeString("ku");
+
+document.getElementById("gregorian").innerText =
+now.toLocaleDateString("ku");
+}
+
+setInterval(updateTime,1000);
+updateTime();
+
+// 🔥 Hijri Date
+function hijriDate(){
+let today = new Date();
+
+let hijri = new Intl.DateTimeFormat('ar-TN-u-ca-islamic', {
+day:'numeric',
+month:'long',
+year:'numeric'
+}).format(today);
+
+document.getElementById("hijri").innerText = hijri;
+}
+
+hijriDate();
+</script>
+
+</body>
+</html>
