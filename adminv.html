@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+<meta charset="UTF-8">
+<title>Admin Visa</title>
+<style>
+body{background:#111;color:white;font-family:sans-serif;padding:20px}
+.card{background:#1c1c1c;padding:15px;margin:10px 0;border-radius:10px}
+input{width:100%;padding:8px;margin:5px 0}
+button{padding:8px;margin:5px}
+</style>
+</head>
+
+<body>
+
+<h2>⚙️ Settings</h2>
+
+<input id="p3" placeholder="3m price">
+<input id="p1" placeholder="1y price">
+<input id="fib">
+<input id="fastpay">
+<input id="qicard">
+<button onclick="save()">Save</button>
+
+<h2>📄 Requests</h2>
+<div id="list"></div>
+
+<script>
+const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+const URL="https://igydtqampcfbvyymlmxg.supabase.co";
+
+// load settings
+function load(){
+fetch(URL+"/rest/v1/visa_settings?id=eq.1",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
+.then(r=>r.json()).then(d=>{
+let s=d[0];
+p3.value=s.price_3m;
+p1.value=s.price_1y;
+fib.value=s.fib;
+fastpay.value=s.fastpay;
+qicard.value=s.qicard;
+});
+}
+function save(){
+fetch(URL+"/rest/v1/visa_settings?id=eq.1",{
+method:"PATCH",
+headers:{"Content-Type":"application/json",apikey:KEY,Authorization:"Bearer "+KEY},
+body:JSON.stringify({
+price_3m:p3.value,
+price_1y:p1.value,
+fib:fib.value,
+fastpay:fastpay.value,
+qicard:qicard.value
+})
+}).then(()=>alert("saved"));
+}
+
+// load requests
+function loadReq(){
+fetch(URL+"/rest/v1/visa_requests?select=*",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
+.then(r=>r.json()).then(data=>{
+let html="";
+data.reverse().forEach(o=>{
+html+=`
+<div class="card">
+👤 ${o.name}<br>
+📞 ${o.phone}<br>
+📄 ${o.visa_type}<br>
+💰 ${o.price}<br>
+
+<img src="${o.passport_image}">
+<img src="${o.payment_image}">
+
+<button onclick="status(${o.id},'approved')">✔️</button>
+<button onclick="status(${o.id},'rejected')">❌</button>
+</div>`;
+});
+document.getElementById("list").innerHTML=html;
+});
+}
+
+function status(id,s){
+fetch(URL+"/rest/v1/visa_requests?id=eq."+id,{
+method:"PATCH",
+headers:{"Content-Type":"application/json",apikey:KEY,Authorization:"Bearer "+KEY},
+body:JSON.stringify({status:s})
+}).then(()=>loadReq());
+}
+
+load();
+loadReq();
+</script>
+
+</body>
+</html>
