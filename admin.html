@@ -2,6 +2,7 @@
 <html lang="ku">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SIWAK ADMIN</title>
 
 <style>
@@ -9,191 +10,111 @@ body{
 font-family:sans-serif;
 background:#111;
 color:white;
+margin:0;
 padding:20px;
 }
-
-h2{margin-top:30px}
+h2{margin-bottom:20px}
 
 .card{
-background:#222;
-padding:12px;
-margin:10px 0;
-border-radius:10px;
+background:#1c1c1c;
+padding:15px;
+margin:12px 0;
+border-radius:12px;
+border-left:5px solid #20c997;
 }
 
-input{
-width:100%;
-padding:8px;
-margin:5px 0;
-border-radius:6px;
-border:none;
+.top{
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+font-weight:bold;
 }
 
-button{
-padding:8px;
-margin:3px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
-
-.saveBtn{
-width:100%;
-margin-top:15px;
+.badge{
 background:#20c997;
-color:white;
+padding:4px 8px;
+border-radius:6px;
+font-size:12px;
 }
 
-.ok{background:#20c997;color:white}
-.no{background:#dc3545;color:white}
+.phone{color:#0dcaf0}
+.note{opacity:0.8;margin-top:5px}
 
-.status{
-font-size:13px;
-opacity:0.8;
-margin-top:5px;
+.refresh{
+background:#20c997;
+padding:10px;
+border-radius:10px;
+cursor:pointer;
+display:inline-block;
+margin-bottom:15px;
+}
+
+.empty{
+opacity:0.6;
+text-align:center;
+margin-top:40px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>SIWAK ADMIN</h1>
+<h2>📊 داواکارییەکان</h2>
 
-<!-- ================= ORDERS ================= -->
-<h2>📥 داواکاریەکان</h2>
-<div id="orders"></div>
+<div class="refresh" onclick="load()">🔄 نوێکردنەوە</div>
 
-<!-- ================= HOTELS ================= -->
-<h2>🏨 Makkah Hotels</h2>
-<div id="makkah"></div>
-
-<h2>🕌 Madina Hotels</h2>
-<div id="madina"></div>
-
-<!-- ================= PAYMENTS ================= -->
-<h2>💳 Payments</h2>
-<div class="card">
-<input id="fib" placeholder="FIB number">
-<input id="fast" placeholder="FastPay number">
-<input id="qi" placeholder="QiCard number">
-</div>
-
-<button class="saveBtn" onclick="save()">💾 Save Changes</button>
+<div id="list">Loading...</div>
 
 <script>
 
-/* ================= LOAD ================= */
+const API="https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders?select=*";
+const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-let data = JSON.parse(localStorage.getItem("adminData")) || {
-makkah:[],
-madina:[],
-payments:{FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"}
-};
+function load(){
+document.getElementById("list").innerHTML="Loading...";
 
-/* ensure 14 hotels */
-function fix(list,city){
-if(!list || list.length!==14){
-let arr=[];
-for(let i=1;i<=14;i++){
-arr.push({name:city+" Hotel "+i,rating:4.5,price:100+i});
+fetch(API,{
+headers:{
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
 }
-return arr;
+})
+.then(res=>res.json())
+.then(data=>{
+
+if(data.length===0){
+document.getElementById("list").innerHTML="<div class='empty'>هیچ داواکارییەک نیە</div>";
+return;
 }
-return list;
-}
 
-data.makkah = fix(data.makkah,"Makkah");
-data.madina = fix(data.madina,"Madina");
-
-/* ================= RENDER HOTELS ================= */
-
-function render(section,id){
 let html="";
-data[section].forEach((h,i)=>{
+
+data.reverse().forEach(o=>{
 html+=`
 <div class="card">
-<input value="${h.name}" onchange="update('${section}',${i},'name',this.value)">
-<input value="${h.rating}" onchange="update('${section}',${i},'rating',this.value)">
-<input value="${h.price}" onchange="update('${section}',${i},'price',this.value)">
+<div class="top">
+<span>🏨 ${o.hotel}</span>
+<span class="badge">New</span>
 </div>
-`;
-});
-document.getElementById(id).innerHTML=html;
-}
 
-render("makkah","makkah");
-render("madina","madina");
+<div>👤 ${o.name}</div>
+<div class="phone">📞 ${o.phone}</div>
 
-/* ================= UPDATE ================= */
-
-function update(section,i,key,val){
-data[section][i][key]=val;
-}
-
-/* ================= SAVE ================= */
-
-function save(){
-data.payments.FIB = document.getElementById("fib").value;
-data.payments.FastPay = document.getElementById("fast").value;
-data.payments.QiCard = document.getElementById("qi").value;
-
-localStorage.setItem("adminData",JSON.stringify(data));
-
-alert("✔️ Saved");
-}
-
-/* fill payments */
-document.getElementById("fib").value=data.payments.FIB;
-document.getElementById("fast").value=data.payments.FastPay;
-document.getElementById("qi").value=data.payments.QiCard;
-
-/* ================= ORDERS ================= */
-
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-
-function renderOrders(){
-let html="";
-
-if(orders.length===0){
-html="<div class='card'>هیچ داواکاری نییە</div>";
-}
-
-orders.forEach((o,i)=>{
-html+=`
-<div class="card">
-<b>${o.name}</b><br>
-🏨 ${o.hotel}<br>
-📞 ${o.phone}<br>
-💳 ${o.payment}<br>
-<div class="status">📅 ${o.date}</div>
-<div class="status">Status: ${o.status}</div>
-
-<button class="ok" onclick="approve(${i})">Approve</button>
-<button class="no" onclick="cancel(${i})">Cancel</button>
+<div class="note">📝 ${o.note || "—"}</div>
 </div>
 `;
 });
 
-document.getElementById("orders").innerHTML=html;
+document.getElementById("list").innerHTML=html;
+
+})
+.catch(()=>{
+document.getElementById("list").innerHTML="<div class='empty'>❌ هەڵەیەک ڕوویدا</div>";
+});
+
 }
 
-function approve(i){
-orders[i].status="approved";
-saveOrders();
-}
-
-function cancel(i){
-orders[i].status="canceled";
-saveOrders();
-}
-
-function saveOrders(){
-localStorage.setItem("orders",JSON.stringify(orders));
-renderOrders();
-}
-
-/* start */
-renderOrders();
+load();
 
 </script>
 
