@@ -35,13 +35,15 @@ button{padding:8px;margin:5px;border:none;border-radius:6px;cursor:pointer}
 <!-- 💳 PAYMENT -->
 <div class="card">
 <h3>💳 پارەدان</h3>
-
 <input id="fib" placeholder="FIB">
 <input id="fastpay" placeholder="FastPay">
 <input id="qicard" placeholder="QiCard">
-
 <button class="save" onclick="savePay()">💾 Save</button>
 </div>
+
+<!-- 📊 ORDERS -->
+<h2>📊 داواکارییەکان</h2>
+<div id="ordersList">Loading...</div>
 
 <script>
 
@@ -50,46 +52,31 @@ const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
 function load(){
 fetch(API+"?select=*",{
-headers:{
-"apikey":KEY,
-"Authorization":"Bearer "+KEY
-}
+headers:{ "apikey":KEY, "Authorization":"Bearer "+KEY }
 })
 .then(res=>res.json())
 .then(data=>{
-
 let html="";
-
 data.forEach(h=>{
 html+=`
 <div class="card">
-
 <input value="${h.name}" id="name${h.id}">
 <input value="${h.rating}" id="rating${h.id}">
 <input value="${h.price}" id="price${h.id}">
 <input value="${h.loc}" id="loc${h.id}">
 <input value="${h.city}" id="city${h.id}">
-
 <button class="save" onclick="update(${h.id})">💾 Save</button>
 <button class="delete" onclick="del(${h.id})">🗑 Delete</button>
-
-</div>
-`;
+</div>`;
 });
-
 document.getElementById("list").innerHTML=html;
-
 });
 }
 
 function update(id){
 fetch(API+"?id=eq."+id,{
 method:"PATCH",
-headers:{
-"Content-Type":"application/json",
-"apikey":KEY,
-"Authorization":"Bearer "+KEY
-},
+headers:{ "Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY },
 body:JSON.stringify({
 name:document.getElementById("name"+id).value,
 rating:document.getElementById("rating"+id).value,
@@ -103,21 +90,14 @@ city:document.getElementById("city"+id).value
 function del(id){
 fetch(API+"?id=eq."+id,{
 method:"DELETE",
-headers:{
-"apikey":KEY,
-"Authorization":"Bearer "+KEY
-}
+headers:{ "apikey":KEY,"Authorization":"Bearer "+KEY }
 }).then(()=>load());
 }
 
 function addHotel(){
 fetch(API,{
 method:"POST",
-headers:{
-"Content-Type":"application/json",
-"apikey":KEY,
-"Authorization":"Bearer "+KEY
-},
+headers:{ "Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY },
 body:JSON.stringify({
 name:document.getElementById("name").value,
 rating:document.getElementById("rating").value,
@@ -128,13 +108,10 @@ city:document.getElementById("city").value
 }).then(()=>load());
 }
 
-// 💳 PAYMENT FUNCTIONS
+// 💳 PAYMENT
 function loadPay(){
 fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/payments?id=eq.1",{
-headers:{
-"apikey":KEY,
-"Authorization":"Bearer "+KEY
-}
+headers:{ "apikey":KEY,"Authorization":"Bearer "+KEY }
 })
 .then(res=>res.json())
 .then(d=>{
@@ -147,11 +124,7 @@ document.getElementById("qicard").value=d[0].qicard;
 function savePay(){
 fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/payments?id=eq.1",{
 method:"PATCH",
-headers:{
-"Content-Type":"application/json",
-"apikey":KEY,
-"Authorization":"Bearer "+KEY
-},
+headers:{ "Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+KEY },
 body:JSON.stringify({
 fib:document.getElementById("fib").value,
 fastpay:document.getElementById("fastpay").value,
@@ -160,8 +133,37 @@ qicard:document.getElementById("qicard").value
 }).then(()=>alert("Saved ✔️"));
 }
 
+// 📊 ORDERS
+function loadOrders(){
+fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders?select=*",{
+headers:{ "apikey":KEY,"Authorization":"Bearer "+KEY }
+})
+.then(res=>res.json())
+.then(data=>{
+let html="";
+if(data.length===0){
+html="هیچ داواکارییەک نیە";
+}else{
+data.reverse().forEach(o=>{
+html+=`
+<div class="card">
+🏨 ${o.hotel}<br>
+👤 ${o.name}<br>
+📞 ${o.phone}<br>
+📝 ${o.note || "-"}
+
+${o.image ? `<img src="${o.image}" style="width:100%;margin-top:10px;border-radius:10px;">` : ""}
+
+</div>`;
+});
+}
+document.getElementById("ordersList").innerHTML=html;
+});
+}
+
 load();
 loadPay();
+loadOrders();
 
 </script>
 
