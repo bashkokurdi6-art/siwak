@@ -1,64 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="ku">
 <head>
 <meta charset="UTF-8">
-<title>ADMIN PRO</title>
+<title>SIWAK ADMIN</title>
 
 <style>
-body{font-family:sans-serif;background:#111;color:white;padding:20px}
-.card{background:#222;padding:15px;margin:10px 0;border-radius:10px}
-input{width:100%;padding:8px;margin:5px 0;border-radius:6px;border:none}
-button{padding:12px;width:100%;background:#20c997;color:white;border:none;border-radius:10px}
+body{
+font-family:sans-serif;
+background:#111;
+color:white;
+padding:20px;
+}
+
+h2{margin-top:30px}
+
+.card{
+background:#222;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+}
+
+input{
+width:100%;
+padding:8px;
+margin:5px 0;
+border-radius:6px;
+border:none;
+}
+
+button{
+padding:8px;
+margin:3px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+.saveBtn{
+width:100%;
+margin-top:15px;
+background:#20c997;
+color:white;
+}
+
+.ok{background:#20c997;color:white}
+.no{background:#dc3545;color:white}
+
+.status{
+font-size:13px;
+opacity:0.8;
+margin-top:5px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>🏨 Makkah</h2>
+<h1>SIWAK ADMIN</h1>
+
+<!-- ================= ORDERS ================= -->
+<h2>📥 داواکاریەکان</h2>
+<div id="orders"></div>
+
+<!-- ================= HOTELS ================= -->
+<h2>🏨 Makkah Hotels</h2>
 <div id="makkah"></div>
 
-<h2>🕌 Madina</h2>
+<h2>🕌 Madina Hotels</h2>
 <div id="madina"></div>
 
+<!-- ================= PAYMENTS ================= -->
 <h2>💳 Payments</h2>
 <div class="card">
-<input id="fib">
-<input id="fast">
-<input id="qi">
+<input id="fib" placeholder="FIB number">
+<input id="fast" placeholder="FastPay number">
+<input id="qi" placeholder="QiCard number">
 </div>
 
-<button onclick="save()">💾 Save</button>
+<button class="saveBtn" onclick="save()">💾 Save Changes</button>
 
-<script type="module">
+<script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+/* ================= LOAD ================= */
 
-/* 🔥 داتاکانی خۆت دابنێ */
-const firebaseConfig = {
-apiKey: "XXXX",
-authDomain: "XXXX",
-projectId: "XXXX"
+let data = JSON.parse(localStorage.getItem("adminData")) || {
+makkah:[],
+madina:[],
+payments:{FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"}
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+/* ensure 14 hotels */
+function fix(list,city){
+if(!list || list.length!==14){
+let arr=[];
+for(let i=1;i<=14;i++){
+arr.push({name:city+" Hotel "+i,rating:4.5,price:100+i});
+}
+return arr;
+}
+return list;
+}
 
-let data = {
-makkah:Array(7).fill({name:"Hotel",rating:4.5,price:100}),
-madina:Array(7).fill({name:"Hotel",rating:4.5,price:100}),
-payments:{FIB:"0750",FastPay:"0770",QiCard:"0780"}
-};
+data.makkah = fix(data.makkah,"Makkah");
+data.madina = fix(data.madina,"Madina");
+
+/* ================= RENDER HOTELS ================= */
 
 function render(section,id){
 let html="";
 data[section].forEach((h,i)=>{
 html+=`
 <div class="card">
-<input value="${h.name}" onchange="data.${section}[${i}].name=this.value">
-<input value="${h.rating}" onchange="data.${section}[${i}].rating=this.value">
-<input value="${h.price}" onchange="data.${section}[${i}].price=this.value">
-</div>`;
+<input value="${h.name}" onchange="update('${section}',${i},'name',this.value)">
+<input value="${h.rating}" onchange="update('${section}',${i},'rating',this.value)">
+<input value="${h.price}" onchange="update('${section}',${i},'price',this.value)">
+</div>
+`;
 });
 document.getElementById(id).innerHTML=html;
 }
@@ -66,15 +124,76 @@ document.getElementById(id).innerHTML=html;
 render("makkah","makkah");
 render("madina","madina");
 
-window.save = async ()=>{
+/* ================= UPDATE ================= */
+
+function update(section,i,key,val){
+data[section][i][key]=val;
+}
+
+/* ================= SAVE ================= */
+
+function save(){
 data.payments.FIB = document.getElementById("fib").value;
 data.payments.FastPay = document.getElementById("fast").value;
 data.payments.QiCard = document.getElementById("qi").value;
 
-await setDoc(doc(db,"siwak","data"),data);
+localStorage.setItem("adminData",JSON.stringify(data));
 
-alert("Saved ✔️");
-};
+alert("✔️ Saved");
+}
+
+/* fill payments */
+document.getElementById("fib").value=data.payments.FIB;
+document.getElementById("fast").value=data.payments.FastPay;
+document.getElementById("qi").value=data.payments.QiCard;
+
+/* ================= ORDERS ================= */
+
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+function renderOrders(){
+let html="";
+
+if(orders.length===0){
+html="<div class='card'>هیچ داواکاری نییە</div>";
+}
+
+orders.forEach((o,i)=>{
+html+=`
+<div class="card">
+<b>${o.name}</b><br>
+🏨 ${o.hotel}<br>
+📞 ${o.phone}<br>
+💳 ${o.payment}<br>
+<div class="status">📅 ${o.date}</div>
+<div class="status">Status: ${o.status}</div>
+
+<button class="ok" onclick="approve(${i})">Approve</button>
+<button class="no" onclick="cancel(${i})">Cancel</button>
+</div>
+`;
+});
+
+document.getElementById("orders").innerHTML=html;
+}
+
+function approve(i){
+orders[i].status="approved";
+saveOrders();
+}
+
+function cancel(i){
+orders[i].status="canceled";
+saveOrders();
+}
+
+function saveOrders(){
+localStorage.setItem("orders",JSON.stringify(orders));
+renderOrders();
+}
+
+/* start */
+renderOrders();
 
 </script>
 
