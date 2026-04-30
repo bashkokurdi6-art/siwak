@@ -7,7 +7,6 @@
 
 <style>
 *{box-sizing:border-box}
-
 body{
 margin:0;
 font-family:sans-serif;
@@ -15,7 +14,6 @@ background:url("bg.jpg") center/cover fixed;
 color:white;
 padding-top:200px;
 }
-
 body::before{
 content:"";
 position:fixed;
@@ -24,146 +22,43 @@ height:100%;
 background:rgba(0,0,0,0.5);
 z-index:-1;
 }
-
-.section{
-position:relative;
-margin:15px;
-cursor:pointer;
-}
-
-.section img{
-width:100%;
-height:200px;
-object-fit:cover;
-border-radius:20px;
-}
-
+.section{position:relative;margin:15px;cursor:pointer}
+.section img{width:100%;height:200px;object-fit:cover;border-radius:20px}
 .title{
-position:absolute;
-bottom:10px;
-left:50%;
+position:absolute;bottom:10px;left:50%;
 transform:translateX(-50%);
 background:rgba(0,0,0,0.7);
-padding:10px 20px;
-border-radius:12px;
+padding:10px 20px;border-radius:12px
 }
-
 .hotels{display:none;margin:10px}
-
 .card{
 background:rgba(255,255,255,0.15);
 backdrop-filter:blur(12px);
-padding:15px;
-margin:12px 0;
-border-radius:15px;
-cursor:pointer;
-transition:0.3s;
+padding:15px;margin:12px 0;border-radius:15px;
+cursor:pointer
 }
-
-.card:hover{
-transform:scale(1.03);
-background:rgba(255,255,255,0.25);
-}
-
 .form{
 display:none;
 background:rgba(255,255,255,0.15);
 backdrop-filter:blur(15px);
-color:white;
-margin:15px;
-padding:18px;
-border-radius:20px;
-border:1px solid rgba(255,255,255,0.2);
+margin:15px;padding:18px;border-radius:20px
 }
-
 input,textarea{
-width:100%;
-padding:12px;
-margin:6px 0;
-border-radius:12px;
-background:rgba(255,255,255,0.2);
-color:white;
-border:1px solid rgba(255,255,255,0.3);
+width:100%;padding:12px;margin:6px 0;border-radius:12px;
+background:rgba(255,255,255,0.2);color:white;border:none
 }
-
 .payRow{display:flex;gap:10px;margin:10px 0}
-
-.payCard{
-flex:1;
-padding:12px;
-border-radius:12px;
-background:rgba(255,255,255,0.2);
-text-align:center;
-cursor:pointer;
-}
-
-.payCard.active{
-background:#20c997;
-}
-
-.accountBox{
-background:rgba(0,0,0,0.4);
-padding:10px;
-border-radius:10px;
-display:none;
-}
-
-.uploadBox{
-border:2px dashed rgba(255,255,255,0.4);
-padding:15px;
-border-radius:12px;
-text-align:center;
-margin:10px 0;
-}
-
-#preview{
-width:100%;
-display:none;
-margin-top:10px;
-border-radius:10px;
-}
-
-.btn{
-background:linear-gradient(90deg,#198754,#20c997);
-color:white;
-padding:12px;
-border-radius:12px;
-cursor:pointer;
-text-align:center;
-}
-
+.payCard{flex:1;padding:12px;border-radius:12px;background:rgba(255,255,255,0.2);text-align:center;cursor:pointer}
+.payCard.active{background:#20c997}
+.accountBox{background:rgba(0,0,0,0.4);padding:10px;border-radius:10px;display:none}
+.uploadBox{border:2px dashed #ccc;padding:15px;border-radius:12px;text-align:center}
+#preview{width:100%;display:none;margin-top:10px;border-radius:10px}
+.btn{background:#20c997;padding:12px;border-radius:12px;text-align:center;cursor:pointer}
 .popup{
-position:fixed;
-top:0;left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.7);
-display:none;
-justify-content:center;
-align-items:center;
+position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center
 }
-
-.popupBox{
-background:white;
-color:black;
-padding:25px;
-border-radius:20px;
-text-align:center;
-}
-
-.loader{
-border:4px solid #ccc;
-border-top:4px solid #20c997;
-border-radius:50%;
-width:30px;
-height:30px;
-animation:spin 1s linear infinite;
-margin:auto;
-}
-
-@keyframes spin{
-to{transform:rotate(360deg)}
-}
+.popupBox{background:white;color:black;padding:20px;border-radius:15px}
 </style>
 </head>
 
@@ -182,11 +77,9 @@ to{transform:rotate(360deg)}
 <div id="madina" class="hotels"></div>
 
 <form id="formBox" class="form">
-
 <input type="hidden" id="hotelInput">
-
-<input name="name" placeholder="ناوی سیانی" required>
-<input name="phone" placeholder="ژمارەی مۆبایل" required>
+<input name="name" placeholder="ناوی سیانی">
+<input name="phone" placeholder="ژمارەی مۆبایل">
 
 <div class="payRow">
 <div class="payCard" onclick="selectPay(this,'FIB')">FIB</div>
@@ -197,7 +90,7 @@ to{transform:rotate(360deg)}
 <div id="accountBox" class="accountBox"></div>
 
 <div class="uploadBox">
-📸 وێنەی پارەناردن
+📸 وێنە
 <input type="file" onchange="previewImg(event)">
 </div>
 
@@ -205,8 +98,7 @@ to{transform:rotate(360deg)}
 
 <textarea name="note" placeholder="تێبینی"></textarea>
 
-<button class="btn" type="submit">✔️ ناردن</button>
-
+<button class="btn">✔️ ناردن</button>
 </form>
 
 <div id="popup" class="popup">
@@ -215,124 +107,99 @@ to{transform:rotate(360deg)}
 
 <script>
 
-/* =========================
-   AUTO ADMIN SYSTEM (READY)
-========================= */
-
-/* load admin data */
+/* ===== DATA ===== */
 let data = JSON.parse(localStorage.getItem("adminData")) || {
 makkah:[],
 madina:[],
-payments:{
-FIB:"0750 XXX",
-FastPay:"0770 XXX",
-QiCard:"0780 XXX"
+payments:{FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"}
 }
-};
 
-/* ensure 14 hotels لكل section */
-function fixHotels(list,city){
+/* ===== FIX 14 HOTELS ===== */
+function fix(list,city){
 if(!list || list.length!==14){
-let arr=[];
+let arr=[]
 for(let i=1;i<=14;i++){
-arr.push({
-name: city+" Hotel "+i,
-rating:4.5,
-price:100+i
-});
+arr.push({name:city+" Hotel "+i,rating:4.5,price:100+i})
 }
-return arr;
+return arr
 }
-return list;
+return list
 }
 
-data.makkah = fixHotels(data.makkah,"Makkah");
-data.madina = fixHotels(data.madina,"Madina");
+data.makkah=fix(data.makkah,"Makkah")
+data.madina=fix(data.madina,"Madina")
 
-/* render hotels */
+/* ===== RENDER ===== */
 function render(id,list){
-let html="";
+let html=""
 list.forEach(h=>{
 html+=`
 <div class="card" onclick="openForm('${h.name}')">
-<div style="font-weight:bold">🏨 ${h.name}</div>
-<div style="font-size:14px;opacity:0.9">⭐ ${h.rating}</div>
-<div style="color:#20c997;font-weight:bold">💰 $${h.price}</div>
-</div>
-`;
-});
-document.getElementById(id).innerHTML=html;
+<b>🏨 ${h.name}</b><br>
+⭐ ${h.rating}<br>
+💰 $${h.price}
+</div>`
+})
+document.getElementById(id).innerHTML=html
 }
 
-render("makkah",data.makkah);
-render("madina",data.madina);
+render("makkah",data.makkah)
+render("madina",data.madina)
 
-/* toggle */
+/* ===== UI ===== */
 function toggle(id){
-let el=document.getElementById(id);
-el.style.display = el.style.display=="block"?"none":"block";
+let e=document.getElementById(id)
+e.style.display=e.style.display=="block"?"none":"block"
 }
 
-/* open form */
-function openForm(name){
-document.getElementById("formBox").style.display="block";
-document.getElementById("hotelInput").value=name;
-window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+function openForm(n){
+document.getElementById("formBox").style.display="block"
+document.getElementById("hotelInput").value=n
 }
 
-/* payment */
-function selectPay(el,method){
-document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
-el.classList.add("active");
+/* ===== PAYMENT ===== */
+function selectPay(el,m){
+document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"))
+el.classList.add("active")
 
-let box=document.getElementById("accountBox");
-box.style.display="block";
-box.innerText="ژمارە: "+(data.payments[method] || "N/A");
+let b=document.getElementById("accountBox")
+b.style.display="block"
+b.innerText="ژمارە: "+data.payments[m]
 }
 
-/* preview */
+/* ===== PREVIEW ===== */
 function previewImg(e){
-let img=document.getElementById("preview");
-img.src=URL.createObjectURL(e.target.files[0]);
-img.style.display="block";
+let img=document.getElementById("preview")
+img.src=URL.createObjectURL(e.target.files[0])
+img.style.display="block"
 }
 
-/* =========================
-   SAVE ORDER (ADMIN SIDE)
-========================= */
-document.getElementById("formBox").addEventListener("submit",function(e){
+/* ===== SAVE ORDER ===== */
+document.getElementById("formBox").onsubmit=function(e){
+e.preventDefault()
 
-e.preventDefault();
-
-showPopup("<div class='loader'></div><p>چاوەڕێ بکە...</p>");
-
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || []
 
 orders.push({
-hotel:document.getElementById("hotelInput").value,
-name:document.querySelector("[name='name']").value,
-phone:document.querySelector("[name='phone']").value,
-note:document.querySelector("[name='note']").value,
-payment:document.querySelector(".payCard.active")?.innerText || "",
+hotel:hotelInput.value,
+name:this.name.value,
+phone:this.phone.value,
+note:this.note.value,
+payment:document.querySelector(".active")?.innerText || "",
 status:"pending",
 date:new Date().toLocaleString()
-});
+})
 
-localStorage.setItem("orders",JSON.stringify(orders));
+localStorage.setItem("orders",JSON.stringify(orders))
 
-showPopup("✔️ داواکاری نێردرا");
-setTimeout(()=>closePopup(),2000);
-
-});
-
-/* popup */
-function showPopup(html){
-document.getElementById("popupContent").innerHTML=html;
-document.getElementById("popup").style.display="flex";
+popup("✔️ نێردرا\nStatus: pending")
 }
 
-function closePopup(){
-document.getElementById("popup").style.display="none";
+/* ===== POPUP ===== */
+function popup(t){
+popupContent.innerText=t
+popup.style.display="flex"
+setTimeout(()=>popup.style.display="none",2000)
 }
 
 </script>
