@@ -67,24 +67,18 @@ opacity:0.8;
 <button onclick="savePay()">💾 Save</button>
 </div>
 
-<!-- 🔥 Supabase JS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-// 🔥 realtime client
-const supabase = window.supabase.createClient(URL, KEY);
-
-// 🔥 helper (وێنە)
+// 🔥 درستکردنی لینک
 function buildUrl(path){
 if(!path) return "";
 if(path.startsWith("http")) return path;
 return URL+"/storage/v1/object/public/rawza/"+path;
 }
 
-// 🔥 LOAD REQUESTS
+// 🔥 LOAD
 async function load(){
 try{
 let res=await fetch(URL+"/rest/v1/rawza_requests?select=*&order=id.desc",{
@@ -99,7 +93,6 @@ html="هیچ داواکاری نیە";
 }else{
 
 data.forEach(o=>{
-
 let visaImg = buildUrl(o.visa_image);
 let payImg  = buildUrl(o.payment_image);
 
@@ -111,8 +104,8 @@ html+=`
 👥 ${o.gender}<br>
 
 <div class="row">
-${visaImg ? `<img src="${visaImg}" onclick="window.open('${visaImg}')" onerror="this.style.display='none'">` : ""}
-${payImg ? `<img src="${payImg}" onclick="window.open('${payImg}')" onerror="this.style.display='none'">` : ""}
+${visaImg ? `<img src="${visaImg}" onclick="window.open('${visaImg}')">` : ""}
+${payImg ? `<img src="${payImg}" onclick="window.open('${payImg}')">` : ""}
 </div>
 
 <div class="status">
@@ -134,7 +127,7 @@ console.log(e);
 }
 }
 
-// 🔥 UPDATE STATUS
+// 🔥 UPDATE
 async function setStatus(id,s){
 try{
 let res = await fetch(URL+"/rest/v1/rawza_requests?id=eq."+id,{
@@ -150,17 +143,15 @@ body:JSON.stringify({status:s})
 if(res.ok){
 load();
 }else{
-let err = await res.text();
-alert("❌ "+err);
+alert("هەڵە");
 }
 
 }catch(e){
 alert("هەڵە");
-console.log(e);
 }
 }
 
-// 🔥 LOAD PAYMENT SETTINGS
+// 🔥 PAYMENT LOAD
 fetch(URL+"/rest/v1/rawza_settings?id=eq.1",{
 headers:{apikey:KEY,Authorization:"Bearer "+KEY}
 })
@@ -190,20 +181,9 @@ qicard:qicard.value
 .then(()=>alert("✔️ Saved"));
 }
 
-// 🔥 REALTIME 🔥
-supabase
-.channel('rawza-live')
-.on(
-'postgres_changes',
-{ event: '*', schema: 'public', table: 'rawza_requests' },
-payload => {
-console.log("🔄 realtime:", payload);
-load();
-}
-)
-.subscribe();
+// 🔥 AUTO REFRESH (دەستکاریکراو بۆ کارکردن)
+setInterval(load,3000);
 
-// 🔥 start
 load();
 </script>
 
