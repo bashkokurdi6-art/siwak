@@ -215,26 +215,14 @@ to{transform:rotate(360deg)}
 
 <script>
 
-/* 🔥 DATA FROM ADMIN */
+/* =========================
+   AUTO ADMIN SYSTEM (READY)
+========================= */
+
+/* load admin data */
 let data = JSON.parse(localStorage.getItem("adminData")) || {
-makkah:[
-{name:"Hotel 1",rating:4.5,price:120},
-{name:"Hotel 2",rating:4.3,price:150},
-{name:"Hotel 3",rating:4.6,price:180},
-{name:"Hotel 4",rating:4.4,price:140},
-{name:"Hotel 5",rating:4.7,price:200},
-{name:"Hotel 6",rating:4.2,price:110},
-{name:"Hotel 7",rating:4.5,price:130}
-],
-madina:[
-{name:"Hotel 1",rating:4.5,price:120},
-{name:"Hotel 2",rating:4.3,price:150},
-{name:"Hotel 3",rating:4.6,price:180},
-{name:"Hotel 4",rating:4.4,price:140},
-{name:"Hotel 5",rating:4.7,price:200},
-{name:"Hotel 6",rating:4.2,price:110},
-{name:"Hotel 7",rating:4.5,price:130}
-],
+makkah:[],
+madina:[],
 payments:{
 FIB:"0750 XXX",
 FastPay:"0770 XXX",
@@ -242,15 +230,36 @@ QiCard:"0780 XXX"
 }
 };
 
-/* 🔥 RENDER */
+/* ensure 14 hotels لكل section */
+function fixHotels(list,city){
+if(!list || list.length!==14){
+let arr=[];
+for(let i=1;i<=14;i++){
+arr.push({
+name: city+" Hotel "+i,
+rating:4.5,
+price:100+i
+});
+}
+return arr;
+}
+return list;
+}
+
+data.makkah = fixHotels(data.makkah,"Makkah");
+data.madina = fixHotels(data.madina,"Madina");
+
+/* render hotels */
 function render(id,list){
 let html="";
 list.forEach(h=>{
-html+=`<div class="card" onclick="openForm('${h.name}')">
+html+=`
+<div class="card" onclick="openForm('${h.name}')">
 <div style="font-weight:bold">🏨 ${h.name}</div>
 <div style="font-size:14px;opacity:0.9">⭐ ${h.rating}</div>
 <div style="color:#20c997;font-weight:bold">💰 $${h.price}</div>
-</div>`;
+</div>
+`;
 });
 document.getElementById(id).innerHTML=html;
 }
@@ -271,7 +280,7 @@ document.getElementById("hotelInput").value=name;
 window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 
-/* 🔥 PAYMENT FROM ADMIN */
+/* payment */
 function selectPay(el,method){
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
 el.classList.add("active");
@@ -288,29 +297,31 @@ img.src=URL.createObjectURL(e.target.files[0]);
 img.style.display="block";
 }
 
-/* formspree */
+/* =========================
+   SAVE ORDER (ADMIN SIDE)
+========================= */
 document.getElementById("formBox").addEventListener("submit",function(e){
 
 e.preventDefault();
 
 showPopup("<div class='loader'></div><p>چاوەڕێ بکە...</p>");
 
-fetch("https://formspree.io/f/mqedjear",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+orders.push({
 hotel:document.getElementById("hotelInput").value,
 name:document.querySelector("[name='name']").value,
 phone:document.querySelector("[name='phone']").value,
-note:document.querySelector("[name='note']").value
-})
-})
-.then(()=>{
-showPopup("✔️ نێردرا بە سەرکەوتوویی");
-setTimeout(()=>{closePopup()},2000);
+note:document.querySelector("[name='note']").value,
+payment:document.querySelector(".payCard.active")?.innerText || "",
+status:"pending",
+date:new Date().toLocaleString()
 });
+
+localStorage.setItem("orders",JSON.stringify(orders));
+
+showPopup("✔️ داواکاری نێردرا");
+setTimeout(()=>closePopup(),2000);
 
 });
 
