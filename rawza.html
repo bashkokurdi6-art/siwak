@@ -172,6 +172,9 @@ text-align:center;
 <div onclick="setPay(this,'QiCard')">QiCard</div>
 </div>
 
+<!-- 🔥 ژمارەی پارەدان -->
+<div id="acc" style="margin-top:10px;font-size:13px;"></div>
+
 <input type="file" id="payimg" required>
 <img id="pPrev" class="preview">
 
@@ -190,26 +193,46 @@ text-align:center;
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-let gender="",pay="";
+let gender="",pay="",settings={};
 
+// 🔥 load payment numbers from admin
+fetch(URL+"/rest/v1/rawza_settings?id=eq.1",{
+headers:{apikey:KEY,Authorization:"Bearer "+KEY}
+})
+.then(r=>r.json())
+.then(d=>{
+settings=d[0]||{};
+});
+
+// popup
 function pop(t){
 msg.innerText=t;
 popup.style.display="flex";
 setTimeout(()=>popup.style.display="none",2500);
 }
 
+// gender
 function setGender(el,g){
 document.querySelectorAll(".gender div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
 gender=g;
 }
 
+// 🔥 pay + show number
 function setPay(el,p){
 document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
 pay=p;
+
+let num =
+p=="FIB"?settings.fib:
+p=="FastPay"?settings.fastpay:
+settings.qicard;
+
+acc.innerText = num ? "ژمارە: "+num : "ژمارە دیاری نەکراوە";
 }
 
+// preview
 visa.onchange=e=>{
 vPrev.src=URL.createObjectURL(e.target.files[0]);
 vPrev.style.display="block";
@@ -220,6 +243,7 @@ pPrev.src=URL.createObjectURL(e.target.files[0]);
 pPrev.style.display="block";
 };
 
+// submit
 form.onsubmit=async e=>{
 e.preventDefault();
 
@@ -234,6 +258,7 @@ return;
 let vn=Date.now()+"_v_"+v.name;
 let pn=Date.now()+"_p_"+p.name;
 
+// upload
 await fetch(URL+"/storage/v1/object/rawza/"+vn,{
 method:"POST",
 headers:{apikey:KEY,Authorization:"Bearer "+KEY},
@@ -246,7 +271,8 @@ headers:{apikey:KEY,Authorization:"Bearer "+KEY},
 body:p
 });
 
-await fetch(URL+"/rest/v1/rawza_requests",{
+// insert
+let res = await fetch(URL+"/rest/v1/rawza_requests",{
 method:"POST",
 headers:{
 "Content-Type":"application/json",
@@ -266,8 +292,13 @@ note:form.note.value
 })
 });
 
+if(res.ok){
 pop("داواکاریەکەت بەسەرکەوتووی نێردرا ❤️");
 form.reset();
+}else{
+let err=await res.text();
+pop("❌ "+err);
+}
 };
 </script>
 
