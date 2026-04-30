@@ -2,77 +2,168 @@
 <html lang="ku">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rawza</title>
 
 <style>
 body{
 margin:0;
 font-family:sans-serif;
-background:linear-gradient(#0f2027,#203a43,#2c5364);
+background:url("bg.jpg") center/cover fixed;
 color:white;
 }
 
-.wrap{max-width:420px;margin:auto;padding:20px;}
+.overlay{
+background:rgba(0,0,0,0.7);
+min-height:100vh;
+padding:20px;
+}
+
+.wrap{
+max-width:420px;
+margin:auto;
+}
+
+.hero{
+text-align:center;
+background:rgba(255,255,255,0.1);
+padding:15px;
+border-radius:20px;
+margin-bottom:20px;
+backdrop-filter:blur(10px);
+}
+
+.hero h3{
+margin:0;
+font-size:16px;
+line-height:1.8;
+}
 
 .card{
-background:rgba(255,255,255,0.08);
+background:rgba(255,255,255,0.1);
 padding:15px;
 border-radius:15px;
 margin-bottom:15px;
 backdrop-filter:blur(10px);
 }
 
-input,select{
+input,textarea{
 width:100%;
 padding:12px;
 margin-top:8px;
 border:none;
 border-radius:10px;
-background:rgba(255,255,255,0.15);
+background:rgba(255,255,255,0.2);
 color:white;
 }
 
-.pay{display:flex;gap:10px;margin-top:10px;}
-.pay div{
-flex:1;padding:12px;text-align:center;
-background:#333;border-radius:10px;cursor:pointer;
+.row{
+display:flex;
+gap:10px;
 }
-.pay .active{background:#20c997;}
+
+.gender{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+.gender div{
+flex:1;
+padding:10px;
+text-align:center;
+background:#333;
+border-radius:10px;
+cursor:pointer;
+}
+
+.active{background:#20c997}
+
+.preview{
+width:100%;
+margin-top:10px;
+border-radius:10px;
+display:none;
+}
+
+.pay{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+.pay div{
+flex:1;
+padding:10px;
+text-align:center;
+background:#333;
+border-radius:10px;
+cursor:pointer;
+}
 
 button{
-width:100%;padding:14px;
-background:#20c997;border:none;
-border-radius:12px;color:white;
+width:100%;
+padding:14px;
+background:linear-gradient(90deg,#20c997,#198754);
+border:none;
+border-radius:12px;
 margin-top:15px;
+}
+
+#popup{
+position:fixed;
+top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.7);
+display:none;
+justify-content:center;
+align-items:center;
+}
+
+#popup div{
+background:white;
+color:black;
+padding:20px;
+border-radius:15px;
+text-align:center;
 }
 </style>
 </head>
 
 <body>
 
+<div class="overlay">
 <div class="wrap">
 
-<h2>🕌 حجز ڕەوزە</h2>
+<div class="hero">
+<h3>
+ما بينَ بيتي ومِنْبَري روضةٌ مِنْ رياضِ الجنةِ<br>
+ومِنْبَري على حوضِي<br><br>
+خلاصة حكم المحدث : صحيح
+</h3>
+</div>
 
 <form id="form" class="card">
 
-<label>جۆر</label>
-<select id="gender">
-<option>نێر</option>
-<option>مێ</option>
-</select>
-
-<label>ڕۆژ</label>
-<input type="date" id="date">
-
-<label>کات</label>
-<input type="time" id="time">
-
-<label>ناو</label>
-<input id="name">
+<label>ناوی سیانی</label>
+<input name="name" required>
 
 <label>ژمارە</label>
-<input id="phone">
+<input name="phone" required>
+
+<div class="row">
+<input type="date" id="date" required>
+<input type="time" id="time" required>
+</div>
+
+<label>جۆر</label>
+<div class="gender">
+<div onclick="setGender(this,'male')">👨 نێر</div>
+<div onclick="setGender(this,'female')">👩 مێ</div>
+</div>
+
+<label>📸 وێنەی ڤیزە</label>
+<input type="file" id="visa" required>
+<img id="vPrev" class="preview">
 
 <label>💳 پارەدان</label>
 <div class="pay">
@@ -81,36 +172,78 @@ margin-top:15px;
 <div onclick="setPay(this,'QiCard')">QiCard</div>
 </div>
 
-<input type="file" id="img">
+<input type="file" id="payimg" required>
+<img id="pPrev" class="preview">
+
+<textarea name="note" placeholder="تێبینی"></textarea>
 
 <button>ناردن</button>
 
 </form>
 
 </div>
+</div>
+
+<div id="popup"><div id="msg"></div></div>
 
 <script>
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-let method="";
+let gender="",pay="";
 
-function setPay(el,m){
+function pop(t){
+msg.innerText=t;
+popup.style.display="flex";
+setTimeout(()=>popup.style.display="none",2500);
+}
+
+function setGender(el,g){
+document.querySelectorAll(".gender div").forEach(x=>x.classList.remove("active"));
+el.classList.add("active");
+gender=g;
+}
+
+function setPay(el,p){
 document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
-method=m;
+pay=p;
 }
+
+visa.onchange=e=>{
+vPrev.src=URL.createObjectURL(e.target.files[0]);
+vPrev.style.display="block";
+};
+
+payimg.onchange=e=>{
+pPrev.src=URL.createObjectURL(e.target.files[0]);
+pPrev.style.display="block";
+};
 
 form.onsubmit=async e=>{
 e.preventDefault();
 
-let file=img.files[0];
-let nameFile=Date.now()+file.name;
+let v=visa.files[0];
+let p=payimg.files[0];
 
-await fetch(URL+"/storage/v1/object/rawza/"+nameFile,{
+if(!v||!p||!gender||!pay){
+pop("هەموو خانەکان پڕ بکە");
+return;
+}
+
+let vn=Date.now()+"_v_"+v.name;
+let pn=Date.now()+"_p_"+p.name;
+
+await fetch(URL+"/storage/v1/object/rawza/"+vn,{
 method:"POST",
 headers:{apikey:KEY,Authorization:"Bearer "+KEY},
-body:file
+body:v
+});
+
+await fetch(URL+"/storage/v1/object/rawza/"+pn,{
+method:"POST",
+headers:{apikey:KEY,Authorization:"Bearer "+KEY},
+body:p
 });
 
 await fetch(URL+"/rest/v1/rawza_requests",{
@@ -121,19 +254,21 @@ apikey:KEY,
 Authorization:"Bearer "+KEY
 },
 body:JSON.stringify({
-name:name.value,
-phone:phone.value,
-gender:gender.value,
+name:form.name.value,
+phone:form.phone.value,
 date:date.value,
 time:time.value,
-payment_method:method,
-payment_image:URL+"/storage/v1/object/public/rawza/"+nameFile
+gender:gender,
+visa_image:URL+"/storage/v1/object/public/rawza/"+vn,
+payment_image:URL+"/storage/v1/object/public/rawza/"+pn,
+payment_method:pay,
+note:form.note.value
 })
 });
 
-alert("✔️ نێردرا");
+pop("داواکاریەکەت بەسەرکەوتووی نێردرا ❤️");
 form.reset();
-}
+};
 </script>
 
 </body>
