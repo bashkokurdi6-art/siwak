@@ -71,13 +71,17 @@ opacity:0.8;
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-// 🔥 helper بۆ دروستکردنی لینک
-function fixImg(path){
+// ✅ چاککراو: bucket جیا
+function fixVisa(path){
 if(!path) return "";
 if(path.startsWith("http")) return path;
+return URL+"/storage/v1/object/public/request_uploads/"+path;
+}
 
-// 🔥 ناوی bucket ـەکەت لێرە دابنێ
-return URL+"/storage/v1/object/public/rawza/"+path;
+function fixPay(path){
+if(!path) return "";
+if(path.startsWith("http")) return path;
+return URL+"/storage/v1/object/public/payment-screenshots/"+path;
 }
 
 // 🔥 LOAD REQUESTS
@@ -96,8 +100,8 @@ html="هیچ داواکاری نیە";
 
 data.forEach(o=>{
 
-let visaImg = fixImg(o.visa_image);
-let payImg  = fixImg(o.payment_image);
+let visaImg = fixVisa(o.visa_image);
+let payImg  = fixPay(o.payment_image);
 
 html+=`
 <div class="card">
