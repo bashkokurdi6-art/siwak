@@ -6,42 +6,40 @@
 <title>Visa</title>
 
 <style>
-body{
-margin:0;font-family:sans-serif;
-background:url("bg.jpg") center/cover fixed;
-color:white;padding:20px;
-}
-.box{background:rgba(0,0,0,0.6);padding:15px;border-radius:12px;margin:10px 0}
-input,textarea,select{
-width:100%;padding:10px;margin:6px 0;border-radius:10px;border:none
-}
+body{margin:0;font-family:sans-serif;background:url("bg.jpg") center/cover fixed;color:white}
+.overlay{background:rgba(0,0,0,0.6);min-height:100vh;padding:20px}
+.box{background:rgba(255,255,255,0.1);padding:15px;margin:10px 0;border-radius:12px;backdrop-filter:blur(10px)}
+input,textarea,select{width:100%;padding:12px;margin:6px 0;border:none;border-radius:10px;background:rgba(255,255,255,0.2);color:white}
 .pay{display:flex;gap:10px}
-.pay div{flex:1;padding:10px;background:#333;text-align:center;border-radius:8px;cursor:pointer}
+.pay div{flex:1;padding:12px;background:#333;text-align:center;border-radius:10px;cursor:pointer}
 .pay .active{background:#20c997}
-.btn{background:#20c997;padding:12px;border:none;border-radius:10px;width:100%}
 img{width:100%;margin-top:10px;border-radius:10px}
+button{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(90deg,#198754,#20c997)}
+.popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center}
+.popupBox{background:white;color:black;padding:25px;border-radius:15px}
 </style>
 </head>
 
 <body>
+<div class="overlay">
 
-<h2>📄 ڤیزە</h2>
+<h2>📄 داواکاری ڤیزە</h2>
 
 <div class="box">
-<select id="visaType">
+<select id="type">
 <option value="3m">سێ مانگی</option>
 <option value="1y">١ ساڵی</option>
 </select>
-
-<div id="priceBox">...</div>
+<div id="price"></div>
 </div>
 
 <form id="form">
+<input name="name" placeholder="ناو" required>
+<input name="phone" placeholder="ژمارە" required>
 
-<input name="name" placeholder="ناوی سیانی" required>
-<input name="phone" placeholder="ژمارەی مۆبایل" required>
-
-<input type="file" id="passport" required>
+📸 پاسپۆرت
+<input type="file" id="pass" required>
+<img id="pPrev">
 
 <textarea name="note" placeholder="تێبینی"></textarea>
 
@@ -53,74 +51,72 @@ img{width:100%;margin-top:10px;border-radius:10px}
 
 <div id="acc"></div>
 
-<input type="file" id="paymentImg" required>
+💳 پارەدان
+<input type="file" id="payimg" required>
+<img id="payPrev">
 
-<button class="btn">ناردن</button>
-
+<button>✔️ ناردن</button>
 </form>
+
+</div>
+
+<div id="popup" class="popup"><div class="popupBox" id="popTxt"></div></div>
 
 <script>
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 
-let settings={},payMethod="";
+let s={},method="";
 
-// load settings
+function pop(t){popTxt.innerHTML=t;popup.style.display="flex";setTimeout(()=>popup.style.display="none",2000);}
+
 fetch(URL+"/rest/v1/visa_settings?id=eq.1",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
-.then(r=>r.json()).then(d=>{
-settings=d[0];
-updatePrice();
-});
+.then(r=>r.json()).then(d=>{s=d[0];upd();});
 
-function updatePrice(){
-let t=document.getElementById("visaType").value;
-document.getElementById("priceBox").innerText="💰 "+(t=="3m"?settings.price_3m:settings.price_1y);
-}
-
-document.getElementById("visaType").onchange=updatePrice;
+function upd(){price.innerText="💰 "+(type.value=="3m"?s.price_3m:s.price_1y);}
+type.onchange=upd;
 
 function setPay(el,m){
 document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
-payMethod=m;
-let map={FIB:settings.fib,FastPay:settings.fastpay,QiCard:settings.qicard};
-document.getElementById("acc").innerText="ژمارە: "+map[m];
+method=m;
+acc.innerText="ژمارە: "+(m=="FIB"?s.fib:m=="FastPay"?s.fastpay:s.qicard);
 }
 
-// submit
-document.getElementById("form").onsubmit=e=>{
+pass.onchange=e=>pPrev.src=URL.createObjectURL(e.target.files[0]);
+payimg.onchange=e=>payPrev.src=URL.createObjectURL(e.target.files[0]);
+
+form.onsubmit=async e=>{
 e.preventDefault();
 
-let pFile=document.getElementById("passport").files[0];
-let payFile=document.getElementById("paymentImg").files[0];
+let p=pass.files[0],py=payimg.files[0];
+if(!p||!py||!method){pop("هەموو خانەکان پڕ بکە");return;}
 
-let pName=Date.now()+"_p_"+pFile.name;
-let payName=Date.now()+"_pay_"+payFile.name;
+let pn=Date.now()+"p"+p.name;
+let pyn=Date.now()+"py"+py.name;
 
-// upload passport
-fetch(URL+"/storage/v1/object/visa/"+pName,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY},body:pFile})
-.then(()=>{
-fetch(URL+"/storage/v1/object/visa/"+payName,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY},body:payFile})
-.then(()=>{
+let u1=await fetch(URL+"/storage/v1/object/visa/"+pn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY},body:p});
+let u2=await fetch(URL+"/storage/v1/object/visa/"+pyn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY},body:py});
 
-fetch(URL+"/rest/v1/visa_requests",{
+if(!u1.ok||!u2.ok){pop("هەڵە لە وێنە");return;}
+
+let r=await fetch(URL+"/rest/v1/visa_requests",{
 method:"POST",
 headers:{"Content-Type":"application/json",apikey:KEY,Authorization:"Bearer "+KEY},
 body:JSON.stringify({
-name:document.querySelector("[name='name']").value,
-phone:document.querySelector("[name='phone']").value,
-note:document.querySelector("[name='note']").value,
-passport_image:URL+"/storage/v1/object/public/visa/"+pName,
-payment_image:URL+"/storage/v1/object/public/visa/"+payName,
-payment_method:payMethod,
-visa_type:document.getElementById("visaType").value,
-price:document.getElementById("priceBox").innerText
+name:form.name.value,
+phone:form.phone.value,
+note:form.note.value,
+passport_image:URL+"/storage/v1/object/public/visa/"+pn,
+payment_image:URL+"/storage/v1/object/public/visa/"+pyn,
+payment_method:method,
+visa_type:type.value,
+price:price.innerText
 })
-}).then(()=>alert("✔️ نێردرا"));
 });
-});
-}
-</script>
 
+r.ok?pop("✔️ نێردرا"):pop("هەڵە");
+};
+</script>
 </body>
 </html>
