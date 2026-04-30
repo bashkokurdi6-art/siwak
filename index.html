@@ -3,192 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>سيواك</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/hijri-date/lib/safe.js"></script>
+<title>SIWAK</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{box-sizing:border-box}
 
 body{
-font-family:'Cairo',sans-serif;
-background:#021a17;
-color:#fff;
+margin:0;
+font-family:sans-serif;
+
+/* 🔥 BACKGROUND */
+background-image:url("bg.jpg");
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+color:white;
 }
 
-/* CONTAINER */
-.container{
-max-width:420px;
-margin:auto;
-padding:20px;
+/* overlay بۆ ڕوونبوون */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+z-index:-1;
 }
 
-/* HEADER */
+/* header */
 .header{
 text-align:center;
-margin-bottom:20px;
-}
-.header h1{
-font-size:30px;
-font-weight:700;
-}
-.header p{
-opacity:.5;
-font-size:13px;
+padding:20px;
+font-size:24px;
+font-weight:bold;
 }
 
-/* HERO */
-.hero{
-border-radius:14px;
-overflow:hidden;
-margin-bottom:20px;
+/* grid */
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+padding:10px;
 }
-.hero img{
+
+/* card */
+.card{
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(10px);
+border-radius:15px;
+overflow:hidden;
+}
+
+.card img{
 width:100%;
-height:160px;
+height:120px;
 object-fit:cover;
 }
 
-/* TIME */
-.time{
-display:flex;
-justify-content:space-between;
-font-size:13px;
-opacity:.6;
-margin-bottom:20px;
+.cardContent{
+padding:10px;
 }
 
-/* FORM */
-.card{
-background:#062925;
-padding:16px;
-border-radius:16px;
+.price{color:#20c997}
+
+/* booking box */
+.booking{
+background:white;
+color:black;
+margin:10px;
+padding:10px;
+border-radius:15px;
 }
 
-input,select,textarea{
+input{
 width:100%;
-padding:14px;
-margin:6px 0;
-border:none;
-border-radius:12px;
-background:#08352f;
-color:#fff;
+padding:10px;
+margin:5px 0;
+border-radius:10px;
+border:1px solid #ccc;
 }
 
-button{
-width:100%;
-padding:14px;
-margin-top:8px;
-border:none;
-border-radius:14px;
-background:#1fa37a;
-font-weight:600;
-}
-
-/* STATS */
-.stats{
-display:flex;
-justify-content:space-between;
-margin-top:20px;
-}
-.stat{
+.btn{
+background:#198754;
+color:white;
+padding:12px;
 text-align:center;
-flex:1;
-}
-.stat h2{
-font-size:20px;
-}
-.stat span{
-font-size:11px;
-opacity:.4;
-}
-
-.footer{
-text-align:center;
-margin-top:20px;
-opacity:.3;
-font-size:12px;
+border-radius:10px;
+margin-top:10px;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="header">SIWAK 🕌</div>
 
-<div class="header">
-<h1>سيواك</h1>
-<p>حجز ڕەوزەی شەریف</p>
-</div>
+<div id="hotels" class="grid"></div>
 
-<div class="hero">
-<img src="https://images.unsplash.com/photo-1591608516733-0e0c6c1c7e1d">
-</div>
+<div class="booking">
+<b id="selected">هیچ</b>
 
-<div class="time">
-<div>⏰ <span id="clock"></span></div>
-<div>📅 <span id="hijri"></span></div>
-</div>
+<input type="date" id="in">
+<input type="date" id="out">
 
-<div class="card">
-
-<form action="https://formspree.io/f/mdayqnoj" method="POST">
-
-<input name="name" placeholder="ناوی سیانی">
-<input name="whatsapp" placeholder="واتسئاپ">
-
-<select name="type">
-<option>گروپ</option>
-<option>تاک</option>
-</select>
-
-<select name="payment">
-<option>FIB</option>
-<option>FastPay</option>
-<option>Qi Card</option>
-</select>
-
-<input type="date" name="date">
-<input type="file" name="file">
-
-<textarea name="note" placeholder="تێبینی"></textarea>
-
-<button>ناردن</button>
-
-</form>
-
-</div>
-
-<div class="stats">
-<div class="stat">
-<h2 id="views">0</h2>
-<span>سەردان</span>
-</div>
-
-<div class="stat">
-<h2 id="online">1</h2>
-<span>ئۆنلاین</span>
-</div>
-</div>
-
-<div class="footer">© Siwak</div>
-
+<div class="btn" onclick="book()">✔️ حجز</div>
 </div>
 
 <script>
-setInterval(()=>{
-document.getElementById("clock").innerText=new Date().toLocaleTimeString();
-},1000);
 
-let h=new HijriDate();
-document.getElementById("hijri").innerText=h.toString();
+// hotels
+let hotels=[
+{n:"Swissotel",p:200,img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"},
+{n:"Hilton",p:180,img:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"},
+{n:"Pullman",p:150,img:"https://images.unsplash.com/photo-1566073771259-6a8506099945"}
+];
 
-let v=localStorage.getItem("v")||0;
-v++;localStorage.setItem("v",v);
-document.getElementById("views").innerText=v;
+let selected="";
 
-document.getElementById("online").innerText=Math.floor(Math.random()*10)+1;
+// render
+let out="";
+hotels.forEach(h=>{
+out+=`
+<div class="card" onclick="select('${h.n}',${h.p})">
+<img src="${h.img}">
+<div class="cardContent">
+<div>${h.n}</div>
+<div class="price">$${h.p}</div>
+</div>
+</div>`;
+});
+document.getElementById("hotels").innerHTML=out;
+
+// select
+function select(n,p){
+selected=n+" - $"+p;
+document.getElementById("selected").innerText=selected;
+}
+
+// book
+function book(){
+alert("✔️ حجز کرا: "+selected);
+}
+
 </script>
 
 </body>
