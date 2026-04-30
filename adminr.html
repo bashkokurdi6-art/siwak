@@ -58,10 +58,21 @@ opacity:0.8;
 <h2>📄 داواکاری ڕەوزە</h2>
 <div id="list">Loading...</div>
 
+<!-- 🔥 پارەدان -->
+<h2>💳 پارەدان</h2>
+<div class="card">
+<input id="fib" placeholder="FIB">
+<input id="fastpay" placeholder="FastPay">
+<input id="qicard" placeholder="QiCard">
+
+<button onclick="savePay()">💾 Save</button>
+</div>
+
 <script>
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
+// 🔥 LOAD REQUESTS
 async function load(){
 try{
 let res=await fetch(URL+"/rest/v1/rawza_requests?select=*&order=id.desc",{
@@ -69,7 +80,6 @@ headers:{apikey:KEY,Authorization:"Bearer "+KEY}
 });
 
 let data=await res.json();
-
 let html="";
 
 if(data.length===0){
@@ -95,7 +105,6 @@ html+=`
 
 <button class="ok" onclick="setStatus(${o.id},'approved')">✔️ قبوڵ</button>
 <button class="no" onclick="setStatus(${o.id},'rejected')">❌ ڕەت</button>
-
 </div>`;
 });
 
@@ -109,9 +118,9 @@ console.log(e);
 }
 }
 
+// 🔥 UPDATE STATUS
 async function setStatus(id,s){
 try{
-
 let res = await fetch(URL+"/rest/v1/rawza_requests?id=eq."+id,{
 method:"PATCH",
 headers:{
@@ -134,6 +143,36 @@ alert("❌ "+err);
 alert("هەڵە");
 console.log(e);
 }
+}
+
+// 🔥 LOAD PAYMENT SETTINGS
+fetch(URL+"/rest/v1/rawza_settings?id=eq.1",{
+headers:{apikey:KEY,Authorization:"Bearer "+KEY}
+})
+.then(r=>r.json())
+.then(d=>{
+let s=d[0]||{};
+fib.value=s.fib||"";
+fastpay.value=s.fastpay||"";
+qicard.value=s.qicard||"";
+});
+
+// 🔥 SAVE PAYMENT
+function savePay(){
+fetch(URL+"/rest/v1/rawza_settings?id=eq.1",{
+method:"PATCH",
+headers:{
+"Content-Type":"application/json",
+apikey:KEY,
+Authorization:"Bearer "+KEY
+},
+body:JSON.stringify({
+fib:fib.value,
+fastpay:fastpay.value,
+qicard:qicard.value
+})
+})
+.then(()=>alert("✔️ Saved"));
 }
 
 // auto refresh
