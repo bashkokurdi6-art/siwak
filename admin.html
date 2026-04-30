@@ -2,60 +2,79 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ADMIN</title>
+<title>ADMIN PRO</title>
+
 <style>
-body{font-family:sans-serif;padding:20px;background:#111;color:white}
-input{width:100%;padding:8px;margin:5px 0}
+body{font-family:sans-serif;background:#111;color:white;padding:20px}
 .card{background:#222;padding:15px;margin:10px 0;border-radius:10px}
-button{padding:10px;background:#20c997;color:white;border:none;border-radius:8px}
+input{width:100%;padding:8px;margin:5px 0;border-radius:6px;border:none}
+button{padding:12px;width:100%;background:#20c997;color:white;border:none;border-radius:10px}
 </style>
 </head>
 
 <body>
 
-<h2>Admin Dashboard</h2>
+<h2>🏨 Makkah</h2>
+<div id="makkah"></div>
 
-<div id="admin"></div>
+<h2>🕌 Madina</h2>
+<div id="madina"></div>
+
+<h2>💳 Payments</h2>
+<div class="card">
+<input id="fib">
+<input id="fast">
+<input id="qi">
+</div>
 
 <button onclick="save()">💾 Save</button>
 
-<script>
+<script type="module">
 
-let hotels = JSON.parse(localStorage.getItem("hotels")) || [
-{name:"Hotel 1",rating:4.5,location:"Makkah",price:120},
-{name:"Hotel 2",rating:4.3,location:"Makkah",price:150},
-{name:"Hotel 3",rating:4.6,location:"Makkah",price:180},
-{name:"Hotel 4",rating:4.4,location:"Makkah",price:140},
-{name:"Hotel 5",rating:4.7,location:"Makkah",price:200},
-{name:"Hotel 6",rating:4.2,location:"Makkah",price:110},
-{name:"Hotel 7",rating:4.5,location:"Makkah",price:130}
-];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-function render(){
+/* 🔥 داتاکانی خۆت دابنێ */
+const firebaseConfig = {
+apiKey: "XXXX",
+authDomain: "XXXX",
+projectId: "XXXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let data = {
+makkah:Array(7).fill({name:"Hotel",rating:4.5,price:100}),
+madina:Array(7).fill({name:"Hotel",rating:4.5,price:100}),
+payments:{FIB:"0750",FastPay:"0770",QiCard:"0780"}
+};
+
+function render(section,id){
 let html="";
-hotels.forEach((h,i)=>{
+data[section].forEach((h,i)=>{
 html+=`
 <div class="card">
-<input value="${h.name}" onchange="update(${i},'name',this.value)">
-<input value="${h.rating}" onchange="update(${i},'rating',this.value)">
-<input value="${h.location}" onchange="update(${i},'location',this.value)">
-<input value="${h.price}" onchange="update(${i},'price',this.value)">
-</div>
-`;
+<input value="${h.name}" onchange="data.${section}[${i}].name=this.value">
+<input value="${h.rating}" onchange="data.${section}[${i}].rating=this.value">
+<input value="${h.price}" onchange="data.${section}[${i}].price=this.value">
+</div>`;
 });
-document.getElementById("admin").innerHTML=html;
+document.getElementById(id).innerHTML=html;
 }
 
-function update(i,key,val){
-hotels[i][key]=val;
-}
+render("makkah","makkah");
+render("madina","madina");
 
-function save(){
-localStorage.setItem("hotels",JSON.stringify(hotels));
+window.save = async ()=>{
+data.payments.FIB = document.getElementById("fib").value;
+data.payments.FastPay = document.getElementById("fast").value;
+data.payments.QiCard = document.getElementById("qi").value;
+
+await setDoc(doc(db,"siwak","data"),data);
+
 alert("Saved ✔️");
-}
-
-render();
+};
 
 </script>
 
