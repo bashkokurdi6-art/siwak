@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIWAK PRO</title>
+<title>SIWAK</title>
 
 <style>
 *{box-sizing:border-box}
+
 body{
 margin:0;
 font-family:sans-serif;
-background:url("bg.jpg") no-repeat center center fixed;
-background-size:cover;
+background:url("bg.jpg") center/cover fixed;
 color:white;
 }
 
@@ -27,43 +27,49 @@ z-index:-1;
 
 /* section */
 .section{
-margin:20px;
-text-align:center;
+position:relative;
+margin:15px;
 cursor:pointer;
 }
 
 .section img{
 width:100%;
 height:200px;
-border-radius:20px;
 object-fit:cover;
+border-radius:20px;
 }
 
+/* title on image */
 .title{
-margin:10px 0;
-font-size:22px;
-font-weight:bold;
+position:absolute;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(0,0,0,0.6);
+padding:10px 20px;
+border-radius:12px;
+font-size:18px;
 }
 
-/* dashboard */
-.grid{
+/* hotels */
+.hotels{
 display:none;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin:15px;
+margin:10px;
 }
 
 .card{
 background:rgba(255,255,255,0.15);
 backdrop-filter:blur(12px);
-padding:10px;
+padding:12px;
+margin:10px 0;
 border-radius:15px;
+cursor:pointer;
 }
 
-/* payment */
-.payment{
+/* form */
+.form{
 display:none;
-background:rgba(255,255,255,0.9);
+background:rgba(255,255,255,0.95);
 color:black;
 margin:15px;
 padding:15px;
@@ -73,19 +79,20 @@ border-radius:20px;
 input,select,textarea{
 width:100%;
 padding:10px;
-margin:5px 0;
+margin:6px 0;
 border-radius:10px;
 border:1px solid #ccc;
 }
 
 .btn{
-background:#198754;
+background:linear-gradient(90deg,#198754,#20c997);
 color:white;
 padding:12px;
-border-radius:10px;
 text-align:center;
+border-radius:12px;
 margin-top:10px;
 cursor:pointer;
+font-weight:bold;
 }
 
 /* preview */
@@ -102,113 +109,89 @@ border-radius:10px;
 
 <!-- MAKKA -->
 <div class="section" onclick="toggle('makkah')">
-<img src="https://images.unsplash.com/photo-1587145820266-a5951ee6f620">
+<img src="kaaba.jpg">
 <div class="title">هوتێلەکانی مککە</div>
 </div>
 
-<div id="makkah" class="grid"></div>
+<div id="makkah" class="hotels"></div>
 
 <!-- MADINA -->
 <div class="section" onclick="toggle('madina')">
-<img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641">
+<img src="madina.jpg">
 <div class="title">هوتێلەکانی مەدینە</div>
 </div>
 
-<div id="madina" class="grid"></div>
+<div id="madina" class="hotels"></div>
 
-<!-- PAYMENT -->
-<div class="payment" id="payBox">
+<!-- FORM -->
+<form id="formBox" class="form" action="https://formspree.io/f/mqedjear" method="POST">
 
-<input placeholder="ناوی سیانی">
-<input placeholder="ژمارەی مۆبایل">
+<input type="hidden" name="hotel" id="hotelInput">
 
-<select id="paySelect" onchange="showNumber()">
-<option value="">هەڵبژێرە</option>
+<input name="name" placeholder="ناوی سیانی" required>
+<input name="phone" placeholder="ژمارەی مۆبایل" required>
+
+<select name="payment">
 <option>FIB</option>
 <option>FastPay</option>
 <option>QiCard</option>
 </select>
 
-<div id="payNumber"></div>
-
 <input type="file" onchange="previewImg(event)">
 <img id="preview">
 
-<textarea placeholder="تێبینی"></textarea>
+<textarea name="note" placeholder="تێبینی"></textarea>
 
-<div class="btn" onclick="send()">✔️ ناردن</div>
+<button class="btn" type="submit">✔️ ناردن</button>
 
-</div>
+</form>
 
 <script>
 
-// data admin editable
-let hotels = JSON.parse(localStorage.getItem("hotels")) || {
-makkah:[
-{n:"Hotel 1",r:"⭐4.5",l:"Makkah",p:"$120"},
-{n:"Hotel 2",r:"⭐4.3",l:"Makkah",p:"$150"}
-],
-madina:[
-{n:"Hotel A",r:"⭐4.6",l:"Madina",p:"$100"},
-{n:"Hotel B",r:"⭐4.4",l:"Madina",p:"$130"}
-]
-};
+// 7 hotels
+let hotels = ["Hotel 1","Hotel 2","Hotel 3","Hotel 4","Hotel 5","Hotel 6","Hotel 7"];
 
-// render dashboards
-function render(){
-["makkah","madina"].forEach(city=>{
-let out="";
-for(let i=0;i<7;i++){
-let h=hotels[city][i] || {n:"Hotel",r:"⭐4",l:city,p:"$100"};
-out+=`
-<div class="card">
-<div>${h.n}</div>
-<div>${h.r}</div>
-<div>${h.l}</div>
-<div>${h.p}</div>
+function render(id){
+let html="";
+hotels.forEach(h=>{
+html+=`
+<div class="card" onclick="openForm('${h}')">
+🏨 ${h}<br>
+⭐ 4.5<br>
+📍 city<br>
+💰 $120
 </div>`;
-}
-document.getElementById(city).innerHTML=out;
 });
+document.getElementById(id).innerHTML=html;
 }
 
-render();
+render("makkah");
+render("madina");
 
-// toggle
+// toggle section
 function toggle(id){
 let el=document.getElementById(id);
-el.style.display = el.style.display=="grid"?"none":"grid";
-document.getElementById("payBox").style.display="block";
+el.style.display = el.style.display=="block"?"none":"block";
 }
 
-// payment numbers (admin editable)
-let numbers={
-FIB:"0750 XXX",
-FastPay:"0770 XXX",
-QiCard:"0780 XXX"
-};
-
-function showNumber(){
-let val=document.getElementById("paySelect").value;
-document.getElementById("payNumber").innerText=numbers[val] || "";
+// open form
+function openForm(name){
+document.getElementById("formBox").style.display="block";
+document.getElementById("hotelInput").value = name;
+window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 
 // preview image
 function previewImg(e){
-let file=e.target.files[0];
-let reader=new FileReader();
-reader.onload=function(){
 let img=document.getElementById("preview");
-img.src=reader.result;
+img.src=URL.createObjectURL(e.target.files[0]);
 img.style.display="block";
 }
-reader.readAsDataURL(file);
-}
 
-// send
-function send(){
-alert("✔️ ناردرا بە سەرکەوتوویی");
-}
+// alert after send
+document.getElementById("formBox").addEventListener("submit",function(){
+setTimeout(()=>{alert("✔️ ناردرا بە سەرکەوتوویی");},500);
+});
 
 </script>
 
