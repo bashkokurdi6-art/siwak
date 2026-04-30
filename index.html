@@ -15,7 +15,6 @@ background:url("bg.jpg") center/cover fixed;
 color:white;
 }
 
-/* overlay */
 body::before{
 content:"";
 position:fixed;
@@ -25,7 +24,6 @@ background:rgba(0,0,0,0.5);
 z-index:-1;
 }
 
-/* section */
 .section{
 position:relative;
 margin:15px;
@@ -49,7 +47,6 @@ padding:10px 20px;
 border-radius:12px;
 }
 
-/* hotels */
 .hotels{display:none;margin:10px}
 
 .card{
@@ -67,7 +64,7 @@ transform:scale(1.03);
 background:rgba(255,255,255,0.25);
 }
 
-/* form glass */
+/* ===== FORM (هەمانە) ===== */
 .form{
 display:none;
 background:rgba(255,255,255,0.15);
@@ -79,7 +76,6 @@ border-radius:20px;
 border:1px solid rgba(255,255,255,0.2);
 }
 
-/* inputs */
 input,textarea{
 width:100%;
 padding:12px;
@@ -90,7 +86,6 @@ color:white;
 border:1px solid rgba(255,255,255,0.3);
 }
 
-/* payment */
 .payRow{display:flex;gap:10px;margin:10px 0}
 
 .payCard{
@@ -100,15 +95,12 @@ border-radius:12px;
 background:rgba(255,255,255,0.2);
 text-align:center;
 cursor:pointer;
-transition:0.3s;
 }
 
 .payCard.active{
 background:#20c997;
-transform:scale(1.05);
 }
 
-/* account */
 .accountBox{
 background:rgba(0,0,0,0.4);
 padding:10px;
@@ -116,7 +108,6 @@ border-radius:10px;
 display:none;
 }
 
-/* upload */
 .uploadBox{
 border:2px dashed rgba(255,255,255,0.4);
 padding:15px;
@@ -132,7 +123,6 @@ margin-top:10px;
 border-radius:10px;
 }
 
-/* button */
 .btn{
 background:linear-gradient(90deg,#198754,#20c997);
 color:white;
@@ -142,7 +132,6 @@ cursor:pointer;
 text-align:center;
 }
 
-/* popup */
 .popup{
 position:fixed;
 top:0;left:0;
@@ -160,12 +149,6 @@ color:black;
 padding:25px;
 border-radius:20px;
 text-align:center;
-animation:pop 0.4s;
-}
-
-@keyframes pop{
-from{transform:scale(0.5);opacity:0}
-to{transform:scale(1);opacity:1}
 }
 
 .loader{
@@ -236,13 +219,31 @@ to{transform:rotate(360deg)}
 
 <script>
 
-// hotels
-let hotels=["Hotel 1","Hotel 2","Hotel 3","Hotel 4","Hotel 5","Hotel 6","Hotel 7"];
+/* 🔥 تەنها ئەم بەشە گۆڕدرا */
+let hotelsData = [
+{name:"Hotel 1",rating:4.5,location:"Makkah",price:120},
+{name:"Hotel 2",rating:4.3,location:"Makkah",price:150},
+{name:"Hotel 3",rating:4.6,location:"Makkah",price:180},
+{name:"Hotel 4",rating:4.4,location:"Makkah",price:140},
+{name:"Hotel 5",rating:4.7,location:"Makkah",price:200},
+{name:"Hotel 6",rating:4.2,location:"Makkah",price:110},
+{name:"Hotel 7",rating:4.5,location:"Makkah",price:130}
+];
 
 function render(id){
 let html="";
-hotels.forEach(h=>{
-html+=`<div class="card" onclick="openForm('${h}')">🏨 ${h}</div>`;
+hotelsData.forEach(h=>{
+html+=`
+<div class="card" onclick="openForm('${h.name}')">
+<div style="font-weight:bold">🏨 ${h.name}</div>
+<div style="font-size:14px;opacity:0.9">
+⭐ ${h.rating} | 📍 ${h.location}
+</div>
+<div style="color:#20c997;font-weight:bold">
+💰 $${h.price} / night
+</div>
+</div>
+`;
 });
 document.getElementById(id).innerHTML=html;
 }
@@ -250,20 +251,19 @@ document.getElementById(id).innerHTML=html;
 render("makkah");
 render("madina");
 
-// toggle
+/* ===== بەشەکانی تر هەمانە ===== */
+
 function toggle(id){
 let el=document.getElementById(id);
 el.style.display = el.style.display=="block"?"none":"block";
 }
 
-// open form
 function openForm(name){
 document.getElementById("formBox").style.display="block";
 document.getElementById("hotelInput").value=name;
 window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 
-// payment
 function selectPay(el,method){
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
 el.classList.add("active");
@@ -279,14 +279,12 @@ box.style.display="block";
 box.innerText="ژمارە: "+acc[method];
 }
 
-// preview
 function previewImg(e){
 let img=document.getElementById("preview");
 img.src=URL.createObjectURL(e.target.files[0]);
 img.style.display="block";
 }
 
-// submit
 document.getElementById("formBox").addEventListener("submit",function(e){
 
 e.preventDefault();
@@ -304,16 +302,14 @@ note:document.querySelector("[name='note']").value
 })
 })
 .then(()=>{
-showPopup("✔️ داواکاریەکەت نێردرا بە سەرکەوتوویی");
+showPopup("✔️ داواکاریەکەت نێردرا");
 setTimeout(()=>{closePopup()},2000);
 });
 });
 
-// popup
 function showPopup(html){
-let p=document.getElementById("popup");
 document.getElementById("popupContent").innerHTML=html;
-p.style.display="flex";
+document.getElementById("popup").style.display="flex";
 }
 
 function closePopup(){
