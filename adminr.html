@@ -5,13 +5,51 @@
 <title>Admin Rawza</title>
 
 <style>
-body{background:#111;color:white;font-family:sans-serif;padding:20px}
-.card{background:#1c1c1c;padding:15px;margin:10px 0;border-radius:10px}
-img{width:120px;border-radius:10px;margin-top:10px}
-.row{display:flex;gap:10px}
-button{padding:8px;border:none;border-radius:6px}
+body{
+background:#0f2027;
+color:white;
+font-family:sans-serif;
+padding:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+padding:15px;
+margin:15px 0;
+border-radius:15px;
+backdrop-filter:blur(10px);
+box-shadow:0 0 15px rgba(0,0,0,0.4);
+}
+
+.row{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+img{
+width:100px;
+height:100px;
+object-fit:cover;
+border-radius:10px;
+cursor:pointer;
+}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
 .ok{background:#20c997}
 .no{background:#dc3545}
+
+.status{
+margin-top:10px;
+font-size:13px;
+opacity:0.8;
+}
 </style>
 </head>
 
@@ -25,12 +63,18 @@ const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
 async function load(){
+try{
 let res=await fetch(URL+"/rest/v1/rawza_requests?select=*&order=id.desc",{
 headers:{apikey:KEY,Authorization:"Bearer "+KEY}
 });
+
 let data=await res.json();
 
 let html="";
+
+if(data.length===0){
+html="هیچ داواکاری نیە";
+}else{
 
 data.forEach(o=>{
 html+=`
@@ -41,20 +85,34 @@ html+=`
 👥 ${o.gender}<br>
 
 <div class="row">
-<img src="${o.visa_image}">
-<img src="${o.payment_image}">
+<img src="${o.visa_image}" onclick="window.open('${o.visa_image}')">
+<img src="${o.payment_image}" onclick="window.open('${o.payment_image}')">
 </div>
 
-<button class="ok" onclick="setStatus(${o.id},'approved')">✔️</button>
-<button class="no" onclick="setStatus(${o.id},'rejected')">❌</button>
+<div class="status">
+حاڵەت: ${o.status || "چاوەڕوان"}
+</div>
+
+<button class="ok" onclick="setStatus(${o.id},'approved')">✔️ قبوڵ</button>
+<button class="no" onclick="setStatus(${o.id},'rejected')">❌ ڕەت</button>
+
 </div>`;
 });
 
+}
+
 list.innerHTML=html;
+
+}catch(e){
+list.innerHTML="هەڵەی load";
+console.log(e);
+}
 }
 
 async function setStatus(id,s){
-await fetch(URL+"/rest/v1/rawza_requests?id=eq."+id,{
+try{
+
+let res = await fetch(URL+"/rest/v1/rawza_requests?id=eq."+id,{
 method:"PATCH",
 headers:{
 "Content-Type":"application/json",
@@ -63,8 +121,23 @@ Authorization:"Bearer "+KEY
 },
 body:JSON.stringify({status:s})
 });
+
+if(res.ok){
+alert("✔️ نوێکراوە");
 load();
+}else{
+let err = await res.text();
+alert("❌ "+err);
 }
+
+}catch(e){
+alert("هەڵە");
+console.log(e);
+}
+}
+
+// auto refresh
+setInterval(load,4000);
 
 load();
 </script>
