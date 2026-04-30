@@ -7,84 +7,181 @@
 
 <style>
 body{
-margin:0;font-family:sans-serif;
-background:url("bg.jpg") center/cover fixed;
+margin:0;
+font-family:sans-serif;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
 color:white;
 }
+
+/* container */
 .wrap{
-background:rgba(0,0,0,0.65);
-min-height:100vh;padding:20px;
+max-width:420px;
+margin:auto;
+padding:20px;
 }
+
+/* header */
+.header{
+text-align:center;
+margin-bottom:20px;
+}
+
+.header img{
+width:120px;
+margin-bottom:10px;
+}
+
+.header h2{
+margin:0;
+font-size:22px;
+}
+
+/* card */
 .card{
-background:rgba(255,255,255,0.1);
-padding:15px;margin:10px 0;border-radius:15px;
-backdrop-filter:blur(10px);
+background:rgba(255,255,255,0.08);
+padding:15px;
+border-radius:15px;
+margin-bottom:15px;
+backdrop-filter:blur(12px);
+box-shadow:0 0 15px rgba(0,0,0,0.3);
 }
+
+/* inputs */
 input,textarea,select{
-width:100%;padding:12px;margin:6px 0;
-border:none;border-radius:10px;
-background:rgba(255,255,255,0.2);
+width:100%;
+padding:12px;
+margin-top:8px;
+border:none;
+border-radius:10px;
+background:rgba(255,255,255,0.15);
 color:white;
+font-size:14px;
 }
-.pay{display:flex;gap:10px}
+
+/* labels */
+label{
+font-size:13px;
+opacity:0.8;
+}
+
+/* pay buttons */
+.pay{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
 .pay div{
-flex:1;padding:12px;background:#333;
-text-align:center;border-radius:10px;cursor:pointer;
+flex:1;
+padding:12px;
+text-align:center;
+border-radius:10px;
+background:#333;
+cursor:pointer;
+transition:0.3s;
 }
-.pay .active{background:#20c997}
-img{width:100%;margin-top:10px;border-radius:10px;display:none}
+
+.pay div:hover{
+background:#555;
+}
+
+.pay .active{
+background:#20c997;
+}
+
+/* images preview */
+.preview{
+width:100%;
+margin-top:10px;
+border-radius:10px;
+display:none;
+}
+
+/* button */
 button{
-width:100%;padding:14px;
-background:linear-gradient(90deg,#198754,#20c997);
-border:none;border-radius:12px;font-size:16px;
+width:100%;
+padding:14px;
+margin-top:15px;
+border:none;
+border-radius:12px;
+font-size:16px;
+background:linear-gradient(90deg,#20c997,#198754);
+color:white;
+cursor:pointer;
+transition:0.3s;
 }
+
+button:hover{
+opacity:0.8;
+}
+
+/* popup */
 #popup{
-position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,0.7);display:none;
-justify-content:center;align-items:center;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.7);
+display:none;
+justify-content:center;
+align-items:center;
 }
+
 #popup div{
-background:white;color:black;padding:25px;border-radius:15px;
+background:white;
+color:black;
+padding:25px;
+border-radius:15px;
 max-width:90%;
+text-align:center;
 }
 </style>
 </head>
 
 <body>
+
 <div class="wrap">
 
+<div class="header">
+<img src="bg.jpg">
 <h2>📄 داواکاری ڤیزە</h2>
+</div>
 
 <div class="card">
+<label>جۆری ڤیزە</label>
 <select id="type">
 <option value="3m">سێ مانگی</option>
 <option value="1y">١ ساڵی</option>
 </select>
-<div id="price"></div>
+
+<div id="price" style="margin-top:10px;font-size:14px;"></div>
 </div>
 
-<form id="form">
+<form id="form" class="card">
 
-<input name="name" placeholder="ناو" required>
-<input name="phone" placeholder="ژمارە" required>
+<label>ناو</label>
+<input name="name" required>
 
-📸 پاسپۆرت
+<label>ژمارە</label>
+<input name="phone" required>
+
+<label>📸 پاسپۆرت</label>
 <input type="file" id="pass" required>
-<img id="pPrev">
+<img id="pPrev" class="preview">
 
-<textarea name="note" placeholder="تێبینی"></textarea>
+<label>تێبینی</label>
+<textarea name="note"></textarea>
 
+<label>💳 پارەدان</label>
 <div class="pay">
 <div onclick="setPay(this,'FIB')">FIB</div>
 <div onclick="setPay(this,'FastPay')">FastPay</div>
 <div onclick="setPay(this,'QiCard')">QiCard</div>
 </div>
 
-<div id="acc"></div>
+<div id="acc" style="margin-top:10px;font-size:13px;"></div>
 
-💳 پارەدان
 <input type="file" id="payimg" required>
-<img id="payPrev">
+<img id="payPrev" class="preview">
 
 <button>ناردن</button>
 
@@ -103,10 +200,9 @@ let settings={},method="";
 function pop(t){
 msg.innerText=t;
 popup.style.display="flex";
-setTimeout(()=>popup.style.display="none",3000);
+setTimeout(()=>popup.style.display="none",2500);
 }
 
-// load settings
 fetch(URL+"/rest/v1/visa_settings?id=eq.1",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
 .then(r=>r.json())
 .then(d=>{
@@ -123,24 +219,27 @@ function setPay(el,m){
 document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
 method=m;
-acc.innerText="ژمارە: "+(m=="FIB"?settings.fib:m=="FastPay"?settings.fastpay:settings.qicard);
+
+acc.innerText="ژمارە: "+(
+m=="FIB"?settings.fib:
+m=="FastPay"?settings.fastpay:
+settings.qicard
+);
 }
 
-// preview
 pass.onchange=e=>{
 pPrev.src=URL.createObjectURL(e.target.files[0]);
 pPrev.style.display="block";
 };
+
 payimg.onchange=e=>{
 payPrev.src=URL.createObjectURL(e.target.files[0]);
 payPrev.style.display="block";
 };
 
-// submit
 form.onsubmit=async e=>{
 e.preventDefault();
 
-try{
 let p=pass.files[0];
 let py=payimg.files[0];
 
@@ -152,34 +251,19 @@ return;
 let pn=Date.now()+"_p_"+p.name;
 let pyn=Date.now()+"_pay_"+py.name;
 
-// upload passport
-let u1=await fetch(URL+"/storage/v1/object/visa/"+pn,{
+await fetch(URL+"/storage/v1/object/visa/"+pn,{
 method:"POST",
 headers:{apikey:KEY,Authorization:"Bearer "+KEY},
 body:p
 });
 
-if(!u1.ok){
-let err=await u1.text();
-pop("هەڵە پاسپۆرت: "+err);
-return;
-}
-
-// upload payment
-let u2=await fetch(URL+"/storage/v1/object/visa/"+pyn,{
+await fetch(URL+"/storage/v1/object/visa/"+pyn,{
 method:"POST",
 headers:{apikey:KEY,Authorization:"Bearer "+KEY},
 body:py
 });
 
-if(!u2.ok){
-let err=await u2.text();
-pop("هەڵە پارەدان: "+err);
-return;
-}
-
-// save DB
-let db=await fetch(URL+"/rest/v1/visa_requests",{
+await fetch(URL+"/rest/v1/visa_requests",{
 method:"POST",
 headers:{
 "Content-Type":"application/json",
@@ -198,19 +282,10 @@ price:price.innerText
 })
 });
 
-if(db.ok){
 pop("✔️ نێردرا");
 form.reset();
-}else{
-let err=await db.text();
-pop("هەڵە DB: "+err);
-}
-
-}catch(e){
-pop("هەڵەی گشتی");
-console.log(e);
-}
 };
 </script>
+
 </body>
 </html>
