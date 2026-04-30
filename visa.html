@@ -6,26 +6,56 @@
 <title>Visa</title>
 
 <style>
-body{margin:0;font-family:sans-serif;background:url("bg.jpg") center/cover fixed;color:white}
-.overlay{background:rgba(0,0,0,0.6);min-height:100vh;padding:20px}
-.box{background:rgba(255,255,255,0.1);padding:15px;margin:10px 0;border-radius:12px;backdrop-filter:blur(10px)}
-input,textarea,select{width:100%;padding:12px;margin:6px 0;border:none;border-radius:10px;background:rgba(255,255,255,0.2);color:white}
+body{
+margin:0;font-family:sans-serif;
+background:url("bg.jpg") center/cover fixed;
+color:white;
+}
+.wrap{
+background:rgba(0,0,0,0.65);
+min-height:100vh;padding:20px;
+}
+.card{
+background:rgba(255,255,255,0.1);
+padding:15px;margin:10px 0;border-radius:15px;
+backdrop-filter:blur(10px);
+}
+input,textarea,select{
+width:100%;padding:12px;margin:6px 0;
+border:none;border-radius:10px;
+background:rgba(255,255,255,0.2);
+color:white;
+}
 .pay{display:flex;gap:10px}
-.pay div{flex:1;padding:12px;background:#333;text-align:center;border-radius:10px;cursor:pointer}
+.pay div{
+flex:1;padding:12px;background:#333;
+text-align:center;border-radius:10px;cursor:pointer;
+}
 .pay .active{background:#20c997}
-img{width:100%;margin-top:10px;border-radius:10px}
-button{width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(90deg,#198754,#20c997)}
-.popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center}
-.popupBox{background:white;color:black;padding:25px;border-radius:15px}
+img{width:100%;margin-top:10px;border-radius:10px;display:none}
+button{
+width:100%;padding:14px;
+background:linear-gradient(90deg,#198754,#20c997);
+border:none;border-radius:12px;font-size:16px;
+}
+#popup{
+position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,0.7);display:none;
+justify-content:center;align-items:center;
+}
+#popup div{
+background:white;color:black;padding:25px;border-radius:15px;
+max-width:90%;
+}
 </style>
 </head>
 
 <body>
-<div class="overlay">
+<div class="wrap">
 
 <h2>📄 داواکاری ڤیزە</h2>
 
-<div class="box">
+<div class="card">
 <select id="type">
 <option value="3m">سێ مانگی</option>
 <option value="1y">١ ساڵی</option>
@@ -34,6 +64,7 @@ button{width:100%;padding:14px;border:none;border-radius:12px;background:linear-
 </div>
 
 <form id="form">
+
 <input name="name" placeholder="ناو" required>
 <input name="phone" placeholder="ژمارە" required>
 
@@ -55,54 +86,106 @@ button{width:100%;padding:14px;border:none;border-radius:12px;background:linear-
 <input type="file" id="payimg" required>
 <img id="payPrev">
 
-<button>✔️ ناردن</button>
+<button>ناردن</button>
+
 </form>
 
 </div>
 
-<div id="popup" class="popup"><div class="popupBox" id="popTxt"></div></div>
+<div id="popup"><div id="msg"></div></div>
 
 <script>
-const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
+const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-let s={},method="";
+let settings={},method="";
 
-function pop(t){popTxt.innerHTML=t;popup.style.display="flex";setTimeout(()=>popup.style.display="none",2000);}
+function pop(t){
+msg.innerText=t;
+popup.style.display="flex";
+setTimeout(()=>popup.style.display="none",3000);
+}
 
+// load settings
 fetch(URL+"/rest/v1/visa_settings?id=eq.1",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
-.then(r=>r.json()).then(d=>{s=d[0];upd();});
+.then(r=>r.json())
+.then(d=>{
+settings=d[0]||{};
+updatePrice();
+});
 
-function upd(){price.innerText="💰 "+(type.value=="3m"?s.price_3m:s.price_1y);}
-type.onchange=upd;
+function updatePrice(){
+price.innerText="💰 "+(type.value=="3m"?settings.price_3m:settings.price_1y);
+}
+type.onchange=updatePrice;
 
 function setPay(el,m){
 document.querySelectorAll(".pay div").forEach(x=>x.classList.remove("active"));
 el.classList.add("active");
 method=m;
-acc.innerText="ژمارە: "+(m=="FIB"?s.fib:m=="FastPay"?s.fastpay:s.qicard);
+acc.innerText="ژمارە: "+(m=="FIB"?settings.fib:m=="FastPay"?settings.fastpay:settings.qicard);
 }
 
-pass.onchange=e=>pPrev.src=URL.createObjectURL(e.target.files[0]);
-payimg.onchange=e=>payPrev.src=URL.createObjectURL(e.target.files[0]);
+// preview
+pass.onchange=e=>{
+pPrev.src=URL.createObjectURL(e.target.files[0]);
+pPrev.style.display="block";
+};
+payimg.onchange=e=>{
+payPrev.src=URL.createObjectURL(e.target.files[0]);
+payPrev.style.display="block";
+};
 
+// submit
 form.onsubmit=async e=>{
 e.preventDefault();
 
-let p=pass.files[0],py=payimg.files[0];
-if(!p||!py||!method){pop("هەموو خانەکان پڕ بکە");return;}
+try{
+let p=pass.files[0];
+let py=payimg.files[0];
 
-let pn=Date.now()+"p"+p.name;
-let pyn=Date.now()+"py"+py.name;
+if(!p||!py||!method){
+pop("هەموو خانەکان پڕ بکە");
+return;
+}
 
-let u1=await fetch(URL+"/storage/v1/object/visa/"+pn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY},body:p});
-let u2=await fetch(URL+"/storage/v1/object/visa/"+pyn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY},body:py});
+let pn=Date.now()+"_p_"+p.name;
+let pyn=Date.now()+"_pay_"+py.name;
 
-if(!u1.ok||!u2.ok){pop("هەڵە لە وێنە");return;}
-
-let r=await fetch(URL+"/rest/v1/visa_requests",{
+// upload passport
+let u1=await fetch(URL+"/storage/v1/object/visa/"+pn,{
 method:"POST",
-headers:{"Content-Type":"application/json",apikey:KEY,Authorization:"Bearer "+KEY},
+headers:{apikey:KEY,Authorization:"Bearer "+KEY},
+body:p
+});
+
+if(!u1.ok){
+let err=await u1.text();
+pop("هەڵە پاسپۆرت: "+err);
+return;
+}
+
+// upload payment
+let u2=await fetch(URL+"/storage/v1/object/visa/"+pyn,{
+method:"POST",
+headers:{apikey:KEY,Authorization:"Bearer "+KEY},
+body:py
+});
+
+if(!u2.ok){
+let err=await u2.text();
+pop("هەڵە پارەدان: "+err);
+return;
+}
+
+// save DB
+let db=await fetch(URL+"/rest/v1/visa_requests",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+apikey:KEY,
+Authorization:"Bearer "+KEY
+},
 body:JSON.stringify({
 name:form.name.value,
 phone:form.phone.value,
@@ -115,7 +198,18 @@ price:price.innerText
 })
 });
 
-r.ok?pop("✔️ نێردرا"):pop("هەڵە");
+if(db.ok){
+pop("✔️ نێردرا");
+form.reset();
+}else{
+let err=await db.text();
+pop("هەڵە DB: "+err);
+}
+
+}catch(e){
+pop("هەڵەی گشتی");
+console.log(e);
+}
 };
 </script>
 </body>
