@@ -39,13 +39,12 @@ object-fit:cover;
 border-radius:20px;
 }
 
-/* title on image */
 .title{
 position:absolute;
 bottom:10px;
 left:50%;
 transform:translateX(-50%);
-background:rgba(0,0,0,0.6);
+background:rgba(0,0,0,0.7);
 padding:10px 20px;
 border-radius:12px;
 font-size:18px;
@@ -60,30 +59,100 @@ margin:10px;
 .card{
 background:rgba(255,255,255,0.15);
 backdrop-filter:blur(12px);
-padding:12px;
-margin:10px 0;
+padding:15px;
+margin:12px 0;
 border-radius:15px;
 cursor:pointer;
+transition:0.3s;
 }
 
-/* form */
+.card:hover{
+transform:scale(1.03);
+background:rgba(255,255,255,0.25);
+}
+
+.hotelName{font-weight:bold}
+.meta{font-size:14px;margin-top:5px}
+.price{color:#20c997;font-weight:bold}
+
+/* 🔥 FORM (GLASS) */
 .form{
 display:none;
-background:rgba(255,255,255,0.95);
-color:black;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(15px);
+color:white;
 margin:15px;
-padding:15px;
+padding:18px;
 border-radius:20px;
+border:1px solid rgba(255,255,255,0.2);
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-input,select,textarea{
+/* inputs */
+input,textarea{
 width:100%;
-padding:10px;
+padding:12px;
 margin:6px 0;
-border-radius:10px;
-border:1px solid #ccc;
+border-radius:12px;
+background:rgba(255,255,255,0.2);
+color:white;
+border:1px solid rgba(255,255,255,0.3);
 }
 
+input::placeholder,
+textarea::placeholder{
+color:#ddd;
+}
+
+/* payment */
+.payTitle{font-weight:bold;margin-top:10px}
+
+.payRow{display:flex;gap:10px;margin:10px 0}
+
+.payCard{
+flex:1;
+padding:12px;
+border-radius:12px;
+background:rgba(255,255,255,0.2);
+color:white;
+text-align:center;
+cursor:pointer;
+transition:0.3s;
+border:1px solid rgba(255,255,255,0.3);
+}
+
+.payCard.active{
+background:#20c997;
+transform:scale(1.05);
+}
+
+/* account */
+.accountBox{
+background:rgba(0,0,0,0.4);
+padding:10px;
+border-radius:10px;
+margin:10px 0;
+display:none;
+}
+
+/* upload */
+.uploadBox{
+border:2px dashed rgba(255,255,255,0.4);
+padding:15px;
+border-radius:12px;
+text-align:center;
+margin:10px 0;
+}
+
+/* preview */
+#preview{
+width:100%;
+margin-top:10px;
+display:none;
+border-radius:10px;
+}
+
+/* button */
 .btn{
 background:linear-gradient(90deg,#198754,#20c997);
 color:white;
@@ -93,14 +162,6 @@ border-radius:12px;
 margin-top:10px;
 cursor:pointer;
 font-weight:bold;
-}
-
-/* preview */
-#preview{
-width:100%;
-margin-top:10px;
-display:none;
-border-radius:10px;
 }
 </style>
 </head>
@@ -112,7 +173,6 @@ border-radius:10px;
 <img src="kaaba.jpg">
 <div class="title">هوتێلەکانی مککە</div>
 </div>
-
 <div id="makkah" class="hotels"></div>
 
 <!-- MADINA -->
@@ -120,7 +180,6 @@ border-radius:10px;
 <img src="madina.jpg">
 <div class="title">هوتێلەکانی مەدینە</div>
 </div>
-
 <div id="madina" class="hotels"></div>
 
 <!-- FORM -->
@@ -131,13 +190,21 @@ border-radius:10px;
 <input name="name" placeholder="ناوی سیانی" required>
 <input name="phone" placeholder="ژمارەی مۆبایل" required>
 
-<select name="payment">
-<option>FIB</option>
-<option>FastPay</option>
-<option>QiCard</option>
-</select>
+<div class="payTitle">💳 پارەدان</div>
 
+<div class="payRow">
+<div class="payCard" onclick="selectPay(this,'FIB')">FIB</div>
+<div class="payCard" onclick="selectPay(this,'FastPay')">FastPay</div>
+<div class="payCard" onclick="selectPay(this,'QiCard')">QiCard</div>
+</div>
+
+<div id="accountBox" class="accountBox"></div>
+
+<div class="uploadBox">
+📸 وێنەی پارەناردن
 <input type="file" onchange="previewImg(event)">
+</div>
+
 <img id="preview">
 
 <textarea name="note" placeholder="تێبینی"></textarea>
@@ -148,18 +215,24 @@ border-radius:10px;
 
 <script>
 
-// 7 hotels
-let hotels = ["Hotel 1","Hotel 2","Hotel 3","Hotel 4","Hotel 5","Hotel 6","Hotel 7"];
+let hotelsData = [
+{name:"Hotel 1",rating:"⭐ 4.5",location:"Makkah",price:"$120"},
+{name:"Hotel 2",rating:"⭐ 4.3",location:"Makkah",price:"$150"},
+{name:"Hotel 3",rating:"⭐ 4.6",location:"Makkah",price:"$180"},
+{name:"Hotel 4",rating:"⭐ 4.4",location:"Makkah",price:"$140"},
+{name:"Hotel 5",rating:"⭐ 4.7",location:"Makkah",price:"$200"},
+{name:"Hotel 6",rating:"⭐ 4.2",location:"Makkah",price:"$110"},
+{name:"Hotel 7",rating:"⭐ 4.5",location:"Makkah",price:"$130"}
+];
 
 function render(id){
 let html="";
-hotels.forEach(h=>{
+hotelsData.forEach(h=>{
 html+=`
-<div class="card" onclick="openForm('${h}')">
-🏨 ${h}<br>
-⭐ 4.5<br>
-📍 city<br>
-💰 $120
+<div class="card" onclick="openForm('${h.name}')">
+<div class="hotelName">🏨 ${h.name}</div>
+<div class="meta">${h.rating} | 📍 ${h.location}</div>
+<div class="price">${h.price}</div>
 </div>`;
 });
 document.getElementById(id).innerHTML=html;
@@ -168,29 +241,40 @@ document.getElementById(id).innerHTML=html;
 render("makkah");
 render("madina");
 
-// toggle section
 function toggle(id){
 let el=document.getElementById(id);
 el.style.display = el.style.display=="block"?"none":"block";
 }
 
-// open form
 function openForm(name){
 document.getElementById("formBox").style.display="block";
 document.getElementById("hotelInput").value = name;
 window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 
-// preview image
 function previewImg(e){
 let img=document.getElementById("preview");
 img.src=URL.createObjectURL(e.target.files[0]);
 img.style.display="block";
 }
 
-// alert after send
+function selectPay(el,method){
+document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
+el.classList.add("active");
+
+const acc={
+FIB:"0750 XXX XXX",
+FastPay:"0770 XXX XXX",
+QiCard:"0780 XXX XXX"
+};
+
+let box=document.getElementById("accountBox");
+box.style.display="block";
+box.innerText="ژمارە: "+acc[method];
+}
+
 document.getElementById("formBox").addEventListener("submit",function(){
-setTimeout(()=>{alert("✔️ ناردرا بە سەرکەوتوویی");},500);
+setTimeout(()=>{alert("✔️ داواکاریەکەت نێردرا");},500);
 });
 
 </script>
