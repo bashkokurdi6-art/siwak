@@ -215,53 +215,73 @@ to{transform:rotate(360deg)}
 
 <script>
 
-/* admin data */
-let hotelsData = JSON.parse(localStorage.getItem("hotels")) || [
-{name:"Hotel 1",rating:4.5,location:"Makkah",price:120},
-{name:"Hotel 2",rating:4.3,location:"Makkah",price:150},
-{name:"Hotel 3",rating:4.6,location:"Makkah",price:180},
-{name:"Hotel 4",rating:4.4,location:"Makkah",price:140},
-{name:"Hotel 5",rating:4.7,location:"Makkah",price:200},
-{name:"Hotel 6",rating:4.2,location:"Makkah",price:110},
-{name:"Hotel 7",rating:4.5,location:"Makkah",price:130}
-];
+/* 🔥 DATA FROM ADMIN */
+let data = JSON.parse(localStorage.getItem("adminData")) || {
+makkah:[
+{name:"Hotel 1",rating:4.5,price:120},
+{name:"Hotel 2",rating:4.3,price:150},
+{name:"Hotel 3",rating:4.6,price:180},
+{name:"Hotel 4",rating:4.4,price:140},
+{name:"Hotel 5",rating:4.7,price:200},
+{name:"Hotel 6",rating:4.2,price:110},
+{name:"Hotel 7",rating:4.5,price:130}
+],
+madina:[
+{name:"Hotel 1",rating:4.5,price:120},
+{name:"Hotel 2",rating:4.3,price:150},
+{name:"Hotel 3",rating:4.6,price:180},
+{name:"Hotel 4",rating:4.4,price:140},
+{name:"Hotel 5",rating:4.7,price:200},
+{name:"Hotel 6",rating:4.2,price:110},
+{name:"Hotel 7",rating:4.5,price:130}
+],
+payments:{
+FIB:"0750 XXX",
+FastPay:"0770 XXX",
+QiCard:"0780 XXX"
+}
+};
 
-function render(id){
+/* 🔥 RENDER */
+function render(id,list){
 let html="";
-hotelsData.forEach(h=>{
+list.forEach(h=>{
 html+=`<div class="card" onclick="openForm('${h.name}')">
 <div style="font-weight:bold">🏨 ${h.name}</div>
-<div style="font-size:14px;opacity:0.9">⭐ ${h.rating} | 📍 ${h.location}</div>
+<div style="font-size:14px;opacity:0.9">⭐ ${h.rating}</div>
 <div style="color:#20c997;font-weight:bold">💰 $${h.price}</div>
 </div>`;
 });
 document.getElementById(id).innerHTML=html;
 }
 
-render("makkah");
-render("madina");
+render("makkah",data.makkah);
+render("madina",data.madina);
 
+/* toggle */
 function toggle(id){
 let el=document.getElementById(id);
-el.style.display=el.style.display=="block"?"none":"block";
+el.style.display = el.style.display=="block"?"none":"block";
 }
 
+/* open form */
 function openForm(name){
 document.getElementById("formBox").style.display="block";
 document.getElementById("hotelInput").value=name;
 window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
 }
 
+/* 🔥 PAYMENT FROM ADMIN */
 function selectPay(el,method){
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
 el.classList.add("active");
 
-const acc={FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"};
 let box=document.getElementById("accountBox");
 box.style.display="block";
-box.innerText="ژمارە: "+acc[method];
+box.innerText="ژمارە: "+(data.payments[method] || "N/A");
 }
 
+/* preview */
 function previewImg(e){
 let img=document.getElementById("preview");
 img.src=URL.createObjectURL(e.target.files[0]);
@@ -294,6 +314,7 @@ setTimeout(()=>{closePopup()},2000);
 
 });
 
+/* popup */
 function showPopup(html){
 document.getElementById("popupContent").innerHTML=html;
 document.getElementById("popup").style.display="flex";
