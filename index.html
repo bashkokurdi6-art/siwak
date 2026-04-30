@@ -3,17 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIWAK</title>
+<title>SIWAK PRO</title>
 
 <style>
 *{box-sizing:border-box}
-
 body{
 margin:0;
 font-family:sans-serif;
-
-/* 🔥 BACKGROUND */
-background:url("https://raw.githubusercontent.com/bashkokurdi6-art/siwak/main/bg.jpg") no-repeat center center fixed;
+background:url("bg.jpg") no-repeat center center fixed;
 background-size:cover;
 color:white;
 }
@@ -22,87 +19,58 @@ color:white;
 body::before{
 content:"";
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.45);
+background:rgba(0,0,0,0.5);
 z-index:-1;
 }
 
-/* header */
-.header{
+/* section */
+.section{
+margin:20px;
 text-align:center;
-padding:20px;
-font-size:26px;
-font-weight:bold;
-background:rgba(0,0,0,0.3);
-backdrop-filter:blur(10px);
-}
-
-/* search */
-.search{
-margin:15px;
-}
-
-.search input{
-width:100%;
-padding:12px;
-border-radius:12px;
-border:none;
-outline:none;
-}
-
-/* grid */
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-padding:10px;
-}
-
-/* card */
-.card{
-background:rgba(255,255,255,0.15);
-backdrop-filter:blur(12px);
-border-radius:20px;
-overflow:hidden;
 cursor:pointer;
-transition:0.3s;
-border:1px solid rgba(255,255,255,0.2);
 }
 
-.card:hover{
-transform:scale(1.04);
-}
-
-.card img{
+.section img{
 width:100%;
-height:130px;
+height:200px;
+border-radius:20px;
 object-fit:cover;
 }
 
-.cardContent{
-padding:10px;
-}
-
-.price{
-color:#20c997;
+.title{
+margin:10px 0;
+font-size:22px;
 font-weight:bold;
 }
 
-/* booking */
-.booking{
+/* dashboard */
+.grid{
+display:none;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin:15px;
+}
+
+.card{
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(12px);
+padding:10px;
+border-radius:15px;
+}
+
+/* payment */
+.payment{
+display:none;
 background:rgba(255,255,255,0.9);
-backdrop-filter:blur(10px);
 color:black;
 margin:15px;
 padding:15px;
 border-radius:20px;
-animation:fadeUp 0.8s ease;
 }
 
-input{
+input,select,textarea{
 width:100%;
 padding:10px;
 margin:5px 0;
@@ -111,95 +79,136 @@ border:1px solid #ccc;
 }
 
 .btn{
-background:linear-gradient(90deg,#198754,#20c997);
+background:#198754;
 color:white;
-padding:14px;
+padding:12px;
+border-radius:10px;
 text-align:center;
-border-radius:12px;
 margin-top:10px;
 cursor:pointer;
-font-weight:bold;
-transition:0.3s;
 }
 
-.btn:hover{
-transform:scale(1.05);
-}
-
-/* animation */
-@keyframes fadeUp{
-from{opacity:0;transform:translateY(30px)}
-to{opacity:1;transform:translateY(0)}
+/* preview */
+#preview{
+width:100%;
+margin-top:10px;
+display:none;
+border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">SIWAK 🕌</div>
-
-<div class="search">
-<input placeholder="🔍 گەڕان بۆ هۆتێل..." onkeyup="search(this.value)">
+<!-- MAKKA -->
+<div class="section" onclick="toggle('makkah')">
+<img src="https://images.unsplash.com/photo-1587145820266-a5951ee6f620">
+<div class="title">هوتێلەکانی مککە</div>
 </div>
 
-<div id="hotels" class="grid"></div>
+<div id="makkah" class="grid"></div>
 
-<div class="booking">
-<b id="selected">هیچ هەڵنەبژێردراوە</b>
+<!-- MADINA -->
+<div class="section" onclick="toggle('madina')">
+<img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641">
+<div class="title">هوتێلەکانی مەدینە</div>
+</div>
 
-<input type="date" id="in">
-<input type="date" id="out">
+<div id="madina" class="grid"></div>
 
-<div class="btn" onclick="book()">✔️ حجز بکە</div>
+<!-- PAYMENT -->
+<div class="payment" id="payBox">
+
+<input placeholder="ناوی سیانی">
+<input placeholder="ژمارەی مۆبایل">
+
+<select id="paySelect" onchange="showNumber()">
+<option value="">هەڵبژێرە</option>
+<option>FIB</option>
+<option>FastPay</option>
+<option>QiCard</option>
+</select>
+
+<div id="payNumber"></div>
+
+<input type="file" onchange="previewImg(event)">
+<img id="preview">
+
+<textarea placeholder="تێبینی"></textarea>
+
+<div class="btn" onclick="send()">✔️ ناردن</div>
+
 </div>
 
 <script>
 
-let hotels=[
-{n:"Swissotel",p:200,img:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa"},
-{n:"Hilton",p:180,img:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"},
-{n:"Pullman",p:150,img:"https://images.unsplash.com/photo-1566073771259-6a8506099945"},
-{n:"Anjum",p:120,img:"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b"}
-];
+// data admin editable
+let hotels = JSON.parse(localStorage.getItem("hotels")) || {
+makkah:[
+{n:"Hotel 1",r:"⭐4.5",l:"Makkah",p:"$120"},
+{n:"Hotel 2",r:"⭐4.3",l:"Makkah",p:"$150"}
+],
+madina:[
+{n:"Hotel A",r:"⭐4.6",l:"Madina",p:"$100"},
+{n:"Hotel B",r:"⭐4.4",l:"Madina",p:"$130"}
+]
+};
 
-let selected="";
-
-// render
-function render(list){
+// render dashboards
+function render(){
+["makkah","madina"].forEach(city=>{
 let out="";
-list.forEach(h=>{
+for(let i=0;i<7;i++){
+let h=hotels[city][i] || {n:"Hotel",r:"⭐4",l:city,p:"$100"};
 out+=`
-<div class="card" onclick="select('${h.n}',${h.p})">
-<img src="${h.img}">
-<div class="cardContent">
+<div class="card">
 <div>${h.n}</div>
-<div class="price">$${h.p}</div>
-</div>
+<div>${h.r}</div>
+<div>${h.l}</div>
+<div>${h.p}</div>
 </div>`;
+}
+document.getElementById(city).innerHTML=out;
 });
-document.getElementById("hotels").innerHTML=out;
 }
 
-// search
-function search(val){
-let f=hotels.filter(h=>h.n.toLowerCase().includes(val.toLowerCase()));
-render(f);
+render();
+
+// toggle
+function toggle(id){
+let el=document.getElementById(id);
+el.style.display = el.style.display=="grid"?"none":"grid";
+document.getElementById("payBox").style.display="block";
 }
 
-// select
-function select(n,p){
-selected=n+" - $"+p;
-document.getElementById("selected").innerText=selected;
+// payment numbers (admin editable)
+let numbers={
+FIB:"0750 XXX",
+FastPay:"0770 XXX",
+QiCard:"0780 XXX"
+};
 
-window.scrollTo({top:500,behavior:"smooth"});
+function showNumber(){
+let val=document.getElementById("paySelect").value;
+document.getElementById("payNumber").innerText=numbers[val] || "";
 }
 
-// book
-function book(){
-alert("✔️ حجز کرا:\n"+selected);
+// preview image
+function previewImg(e){
+let file=e.target.files[0];
+let reader=new FileReader();
+reader.onload=function(){
+let img=document.getElementById("preview");
+img.src=reader.result;
+img.style.display="block";
+}
+reader.readAsDataURL(file);
 }
 
-render(hotels);
+// send
+function send(){
+alert("✔️ ناردرا بە سەرکەوتوویی");
+}
 
 </script>
 
