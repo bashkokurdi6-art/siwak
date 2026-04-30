@@ -32,6 +32,17 @@ button{padding:8px;margin:5px;border:none;border-radius:6px;cursor:pointer}
 
 <div id="list">Loading...</div>
 
+<!-- 💳 PAYMENT -->
+<div class="card">
+<h3>💳 پارەدان</h3>
+
+<input id="fib" placeholder="FIB">
+<input id="fastpay" placeholder="FastPay">
+<input id="qicard" placeholder="QiCard">
+
+<button class="save" onclick="savePay()">💾 Save</button>
+</div>
+
 <script>
 
 const API="https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/hotels";
@@ -117,7 +128,40 @@ city:document.getElementById("city").value
 }).then(()=>load());
 }
 
+// 💳 PAYMENT FUNCTIONS
+function loadPay(){
+fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/payments?id=eq.1",{
+headers:{
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+}
+})
+.then(res=>res.json())
+.then(d=>{
+document.getElementById("fib").value=d[0].fib;
+document.getElementById("fastpay").value=d[0].fastpay;
+document.getElementById("qicard").value=d[0].qicard;
+});
+}
+
+function savePay(){
+fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/payments?id=eq.1",{
+method:"PATCH",
+headers:{
+"Content-Type":"application/json",
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+},
+body:JSON.stringify({
+fib:document.getElementById("fib").value,
+fastpay:document.getElementById("fastpay").value,
+qicard:document.getElementById("qicard").value
+})
+}).then(()=>alert("Saved ✔️"));
+}
+
 load();
+loadPay();
 
 </script>
 
