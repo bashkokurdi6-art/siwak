@@ -3,77 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIWAK ADMIN</title>
+<title>ADMIN</title>
 
 <style>
-body{
-font-family:sans-serif;
-background:#111;
-color:white;
-margin:0;
-padding:20px;
-}
-h2{margin-bottom:20px}
-
-.card{
-background:#1c1c1c;
-padding:15px;
-margin:12px 0;
-border-radius:12px;
-border-left:5px solid #20c997;
-}
-
-.top{
-display:flex;
-justify-content:space-between;
-margin-bottom:10px;
-font-weight:bold;
-}
-
-.badge{
-background:#20c997;
-padding:4px 8px;
-border-radius:6px;
-font-size:12px;
-}
-
-.phone{color:#0dcaf0}
-.note{opacity:0.8;margin-top:5px}
-
-.refresh{
-background:#20c997;
-padding:10px;
-border-radius:10px;
-cursor:pointer;
-display:inline-block;
-margin-bottom:15px;
-}
-
-.empty{
-opacity:0.6;
-text-align:center;
-margin-top:40px;
-}
+body{font-family:sans-serif;background:#111;color:white;padding:20px}
+input{width:100%;padding:8px;margin:5px 0;border-radius:6px;border:none}
+button{padding:8px;margin:5px;border:none;border-radius:6px;cursor:pointer}
+.card{background:#1c1c1c;padding:15px;margin:10px 0;border-radius:10px}
+.save{background:#20c997}
+.delete{background:#dc3545}
+.add{background:#0d6efd}
 </style>
 </head>
 
 <body>
 
-<h2>📊 داواکارییەکان</h2>
+<h2>🏨 Hotels Admin</h2>
 
-<div class="refresh" onclick="load()">🔄 نوێکردنەوە</div>
+<div class="card">
+<h3>➕ زیادکردن</h3>
+<input id="name" placeholder="ناو">
+<input id="rating" placeholder="⭐">
+<input id="price" placeholder="💰">
+<input id="loc" placeholder="📍">
+<input id="city" placeholder="Makkah / Madina">
+<button class="add" onclick="addHotel()">زیادکردن</button>
+</div>
 
 <div id="list">Loading...</div>
 
 <script>
 
-const API="https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders?select=*";
+const API="https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/hotels";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
 function load(){
-document.getElementById("list").innerHTML="Loading...";
-
-fetch(API,{
+fetch(API+"?select=*",{
 headers:{
 "apikey":KEY,
 "Authorization":"Bearer "+KEY
@@ -82,36 +47,74 @@ headers:{
 .then(res=>res.json())
 .then(data=>{
 
-if(data.length===0){
-document.getElementById("list").innerHTML="<div class='empty'>هیچ داواکارییەک نیە</div>";
-return;
-}
-
 let html="";
 
-data.reverse().forEach(o=>{
+data.forEach(h=>{
 html+=`
 <div class="card">
-<div class="top">
-<span>🏨 ${o.hotel}</span>
-<span class="badge">New</span>
-</div>
 
-<div>👤 ${o.name}</div>
-<div class="phone">📞 ${o.phone}</div>
+<input value="${h.name}" id="name${h.id}">
+<input value="${h.rating}" id="rating${h.id}">
+<input value="${h.price}" id="price${h.id}">
+<input value="${h.loc}" id="loc${h.id}">
+<input value="${h.city}" id="city${h.id}">
 
-<div class="note">📝 ${o.note || "—"}</div>
+<button class="save" onclick="update(${h.id})">💾 Save</button>
+<button class="delete" onclick="del(${h.id})">🗑 Delete</button>
+
 </div>
 `;
 });
 
 document.getElementById("list").innerHTML=html;
 
-})
-.catch(()=>{
-document.getElementById("list").innerHTML="<div class='empty'>❌ هەڵەیەک ڕوویدا</div>";
 });
+}
 
+function update(id){
+fetch(API+"?id=eq."+id,{
+method:"PATCH",
+headers:{
+"Content-Type":"application/json",
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+},
+body:JSON.stringify({
+name:document.getElementById("name"+id).value,
+rating:document.getElementById("rating"+id).value,
+price:document.getElementById("price"+id).value,
+loc:document.getElementById("loc"+id).value,
+city:document.getElementById("city"+id).value
+})
+}).then(()=>load());
+}
+
+function del(id){
+fetch(API+"?id=eq."+id,{
+method:"DELETE",
+headers:{
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+}
+}).then(()=>load());
+}
+
+function addHotel(){
+fetch(API,{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+},
+body:JSON.stringify({
+name:document.getElementById("name").value,
+rating:document.getElementById("rating").value,
+price:document.getElementById("price").value,
+loc:document.getElementById("loc").value,
+city:document.getElementById("city").value
+})
+}).then(()=>load());
 }
 
 load();
