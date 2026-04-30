@@ -71,17 +71,15 @@ opacity:0.8;
 const URL="https://igydtqampcfbvyymlmxg.supabase.co";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-// ✅ چاککراو: bucket جیا
-function fixVisa(path){
+// ✅ smart fix (زۆر گرنگ)
+function buildUrl(path, bucket){
 if(!path) return "";
-if(path.startsWith("http")) return path;
-return URL+"/storage/v1/object/public/request_uploads/"+path;
-}
 
-function fixPay(path){
-if(!path) return "";
+// ئەگەر لینکە تەواوە
 if(path.startsWith("http")) return path;
-return URL+"/storage/v1/object/public/payment-screenshots/"+path;
+
+// ئەگەر تەنها ناوی فایلە
+return URL+"/storage/v1/object/public/"+bucket+"/"+path;
 }
 
 // 🔥 LOAD REQUESTS
@@ -100,8 +98,9 @@ html="هیچ داواکاری نیە";
 
 data.forEach(o=>{
 
-let visaImg = fixVisa(o.visa_image);
-let payImg  = fixPay(o.payment_image);
+// ✅ bucket ـەکانت لێرە دابنێ (ئەگەر ناویان جیا بوو بگۆڕە)
+let visaImg = buildUrl(o.visa_image, "request_uploads");
+let payImg  = buildUrl(o.payment_image, "payment-screenshots");
 
 html+=`
 <div class="card">
@@ -111,8 +110,8 @@ html+=`
 👥 ${o.gender}<br>
 
 <div class="row">
-${visaImg ? `<img src="${visaImg}" onclick="window.open('${visaImg}')">` : ""}
-${payImg ? `<img src="${payImg}" onclick="window.open('${payImg}')">` : ""}
+${visaImg ? `<img src="${visaImg}" onclick="window.open('${visaImg}')" onerror="this.style.display='none'">` : ""}
+${payImg ? `<img src="${payImg}" onclick="window.open('${payImg}')" onerror="this.style.display='none'">` : ""}
 </div>
 
 <div class="status">
