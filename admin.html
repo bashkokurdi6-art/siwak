@@ -50,6 +50,7 @@ button{padding:8px;margin:5px;border:none;border-radius:6px;cursor:pointer}
 const API="https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/hotels";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
+// ================= HOTELS =================
 function load(){
 fetch(API+"?select=*",{
 headers:{ "apikey":KEY, "Authorization":"Bearer "+KEY }
@@ -108,7 +109,7 @@ city:document.getElementById("city").value
 }).then(()=>load());
 }
 
-// 💳 PAYMENT
+// ================= PAYMENT =================
 function loadPay(){
 fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/payments?id=eq.1",{
 headers:{ "apikey":KEY,"Authorization":"Bearer "+KEY }
@@ -133,7 +134,7 @@ qicard:document.getElementById("qicard").value
 }).then(()=>alert("Saved ✔️"));
 }
 
-// 📊 ORDERS
+// ================= ORDERS =================
 function loadOrders(){
 fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders?select=*",{
 headers:{ "apikey":KEY,"Authorization":"Bearer "+KEY }
@@ -141,26 +142,68 @@ headers:{ "apikey":KEY,"Authorization":"Bearer "+KEY }
 .then(res=>res.json())
 .then(data=>{
 let html="";
+
 if(data.length===0){
 html="هیچ داواکارییەک نیە";
 }else{
+
 data.reverse().forEach(o=>{
+
+let color = o.status==="approved" ? "#198754" :
+            o.status==="rejected" ? "#dc3545" : "#ffc107";
+
 html+=`
-<div class="card">
-🏨 ${o.hotel}<br>
+<div class="card" style="border-left:5px solid ${color}">
+
+<b>🏨 ${o.hotel}</b><br>
 👤 ${o.name}<br>
 📞 ${o.phone}<br>
 📝 ${o.note || "-"}
 
+<br>
+Status: <b style="color:${color}">${o.status || "pending"}</b>
+
+<div style="margin-top:10px">
+<button class="save" onclick="updateStatus(${o.id},'approved')">✔️ Accept</button>
+<button class="delete" onclick="updateStatus(${o.id},'rejected')">❌ Reject</button>
+<button onclick="delOrder(${o.id})">🗑 Delete</button>
+</div>
+
 ${o.image ? `<img src="${o.image}" style="width:100%;margin-top:10px;border-radius:10px;">` : ""}
 
-</div>`;
+</div>
+`;
 });
+
 }
+
 document.getElementById("ordersList").innerHTML=html;
 });
 }
 
+function updateStatus(id,status){
+fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders?id=eq."+id,{
+method:"PATCH",
+headers:{
+"Content-Type":"application/json",
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+},
+body:JSON.stringify({status:status})
+}).then(()=>loadOrders());
+}
+
+function delOrder(id){
+fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders?id=eq."+id,{
+method:"DELETE",
+headers:{
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+}
+}).then(()=>loadOrders());
+}
+
+// ================= START =================
 load();
 loadPay();
 loadOrders();
