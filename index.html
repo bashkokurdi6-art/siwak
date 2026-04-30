@@ -102,9 +102,8 @@ border:1px solid rgba(255,255,255,0.3);
 const API_HOTELS="https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/hotels?select=*";
 const KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-// 🔥 load hotels from supabase
+// 🔥 hotels
 function loadHotels(){
-
 fetch(API_HOTELS,{
 headers:{
 "apikey":KEY,
@@ -113,18 +112,13 @@ headers:{
 })
 .then(res=>res.json())
 .then(data=>{
-
 render("makkah","Makkah",data);
 render("madina","Madina",data);
-
 });
-
 }
 
-// 🔥 render
 function render(id,city,data){
 let html="";
-
 data.filter(h=>h.city===city).forEach(h=>{
 html+=`<div class="card" onclick="openForm('${h.name}')">
 <div>🏨 ${h.name}</div>
@@ -132,15 +126,35 @@ html+=`<div class="card" onclick="openForm('${h.name}')">
 <div style="color:#20c997">💰 $${h.price}</div>
 </div>`;
 });
-
 document.getElementById(id).innerHTML=html;
+}
+
+// 🔥 payments
+let acc={};
+
+function loadPayments(){
+fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/payments?id=eq.1",{
+headers:{
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
+}
+})
+.then(res=>res.json())
+.then(data=>{
+acc={
+FIB:data[0].fib,
+FastPay:data[0].fastpay,
+QiCard:data[0].qicard
+};
+});
 }
 
 // 🔥 start
 loadHotels();
+loadPayments();
 
 
-// 👇 ئەمانە هەمانن (دەست مەدە)
+// UI
 function toggle(id){
 ["makkah","madina"].forEach(i=>{
 document.getElementById(i).style.display="none";
@@ -158,10 +172,9 @@ function selectPay(el,method){
 document.querySelectorAll(".payCard").forEach(c=>c.classList.remove("active"));
 el.classList.add("active");
 
-const acc={FIB:"0750 XXX",FastPay:"0770 XXX",QiCard:"0780 XXX"};
 let box=document.getElementById("accountBox");
 box.style.display="block";
-box.innerText="ژمارە: "+acc[method];
+box.innerText="ژمارە: "+(acc[method] || "...");
 }
 
 function previewImg(e){
@@ -170,6 +183,7 @@ img.src=URL.createObjectURL(e.target.files[0]);
 img.style.display="block";
 }
 
+// 🔥 submit
 document.getElementById("formBox").addEventListener("submit",function(e){
 e.preventDefault();
 
@@ -183,13 +197,13 @@ showPopup("<div class='loader'></div><p>چاوەڕێ بکە...</p>");
 // Formspree
 fetch("https://formspree.io/f/mqedjear",{method:"POST"});
 
-// Supabase orders
+// Supabase
 fetch("https://igydtqampcfbvyymlmxg.supabase.co/rest/v1/orders",{
 method:"POST",
 headers:{
 "Content-Type":"application/json",
-"apikey":"sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k",
-"Authorization":"Bearer sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k"
+"apikey":KEY,
+"Authorization":"Bearer "+KEY
 },
 body:JSON.stringify({
 hotel:document.getElementById("hotelInput").value,
@@ -198,8 +212,13 @@ phone:document.querySelector("[name='phone']").value,
 note:document.querySelector("[name='note']").value
 })
 })
-.then(()=>{showPopup("✔️ نێردرا");setTimeout(closePopup,2000);})
-.catch(()=>{showPopup("❌ هەڵە");});
+.then(()=>{
+showPopup("✔️ نێردرا");
+setTimeout(closePopup,2000);
+})
+.catch(()=>{
+showPopup("❌ هەڵە");
+});
 
 });
 
@@ -207,6 +226,7 @@ function showPopup(html){
 document.getElementById("popupContent").innerHTML=html;
 document.getElementById("popup").style.display="flex";
 }
+
 function closePopup(){
 document.getElementById("popup").style.display="none";
 }
