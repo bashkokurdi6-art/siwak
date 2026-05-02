@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html lang="ku">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siwak Video</title>
+
+<style>
+  body {
+    margin: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .video-box {
+    width: 100%;
+    max-width: 360px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 25px rgba(255,215,0,0.5);
+  }
+
+  video {
+    width: 100%;
+    height: auto;
+    background: black;
+  }
+</style>
+
+</head>
+
+<body>
+
+<div class="video-box">
+  <video controls autoplay muted playsinline>
+    <source src="https://files.catbox.moe/9f1y6u.mp4" type="video/mp4">
+  </video>
+</div>
+
+</body>
+</html>
